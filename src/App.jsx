@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { animate, stagger } from "animejs";
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < breakpoint);
@@ -15,22 +16,22 @@ function useIsMobile(breakpoint = 768) {
 }
 
 const C = {
-  bg: "#070710",
-  bgCard: "#0e0e1c",
-  bgElevated: "#161626",
-  bgSurface: "#1c1c2e",
-  navy: "#0d3a6e",
-  navyMid: "#1a5490",
+  bg: "#020c18",
+  bgCard: "#061524",
+  bgElevated: "#091b2e",
+  bgSurface: "#0d2540",
+  navy: "#002b51",
+  navyMid: "#23558a",
   orange: "#f2932b",
   orangeLight: "#fbb55a",
-  sky: "#3a7fa8",
-  skyLight: "#6aaddd",
-  off: "#161626",
-  border: "rgba(255,255,255,0.08)",
-  borderMid: "rgba(255,255,255,0.14)",
-  text: "#e8e8f4",
-  textMid: "#8888aa",
-  textMuted: "#4e4e70",
+  sky: "#92b9d6",
+  skyLight: "#b8d4e8",
+  off: "#091b2e",
+  border: "rgba(146,185,214,0.10)",
+  borderMid: "rgba(146,185,214,0.20)",
+  text: "#ddeaf4",
+  textMid: "#7899aa",
+  textMuted: "#3a5870",
 };
 
 const DEMO_STUDENTS = [
@@ -39,7 +40,230 @@ const DEMO_STUDENTS = [
   { id: "STU-003", name: "Layla Hassan", grade: "Year 2 · Level 5", initials: "LH", color: "#f43f5e" },
 ];
 
-/* ── tiny helpers ── */
+/* ══════════════════════════════════════════
+   VISUAL FX COMPONENTS
+══════════════════════════════════════════ */
+
+/* ── Matrix Rain Canvas ── */
+function MatrixRain({ opacity = 0.18 }) {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animId;
+    const fontSize = 13;
+    let drops = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const cols = Math.floor(canvas.width / fontSize);
+      drops = Array.from({ length: cols }, () => Math.random() * -50);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Mix of tech chars: binary, hex, code symbols, katakana
+    const chars = "アイウエカキクタナハマ01010011<>{}()=+-*/0x9FA3B2C1def function class import return yield async await AI ML NLP CNN RNN 0x1A 0xFF π∑∫∂∇Ω∈";
+
+    function draw() {
+      ctx.fillStyle = "rgba(2,12,24,0.055)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < drops.length; i++) {
+        const idx = Math.floor(Math.random() * chars.length);
+        const char = chars[idx];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+        const isLead = Math.random() > 0.94;
+        const isKeyword = idx > 40 && idx < 80;
+        if (isLead) {
+          ctx.fillStyle = "#92b9d6";
+          ctx.shadowColor = "#92b9d6";
+          ctx.shadowBlur = 8;
+        } else if (isKeyword) {
+          ctx.fillStyle = "rgba(242,147,43,0.6)";
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = "rgba(35,85,138,0.7)";
+          ctx.shadowBlur = 0;
+        }
+        ctx.font = `${fontSize}px 'Courier New', monospace`;
+        ctx.fillText(char, x, y);
+        ctx.shadowBlur = 0;
+        if (y > canvas.height && Math.random() > 0.972) drops[i] = 0;
+        drops[i] += 0.5;
+      }
+      animId = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <canvas ref={canvasRef} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", opacity, pointerEvents: "none", zIndex: 0 }} />
+  );
+}
+
+/* ── Animated Letters (anime.js) ── */
+function AnimatedLetters({ text, style = {}, letterStyle = {}, animDelay = 0, animFrom = "bottom" }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const letters = ref.current.querySelectorAll(".letter");
+    animate(letters, {
+      opacity: [0, 1],
+      translateY: animFrom === "bottom" ? [50, 0] : animFrom === "top" ? [-50, 0] : [0, 0],
+      translateX: animFrom === "left" ? [-30, 0] : animFrom === "right" ? [30, 0] : [0, 0],
+      scale: [0.8, 1],
+      duration: 700,
+      delay: stagger(55, { start: animDelay }),
+      ease: "outExpo",
+    });
+  }, [animDelay, animFrom]);
+  return (
+    <span ref={ref} style={style}>
+      {text.split("").map((ch, i) => (
+        <span key={i} className="letter" style={{ display: "inline-block", opacity: 0, ...letterStyle }}>
+          {ch === " " ? "\u00A0" : ch}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ── Typewriter effect ── */
+function Typewriter({ lines, style = {}, speed = 50, startDelay = 800 }) {
+  const [displayed, setDisplayed] = useState("");
+  const [lineIdx, setLineIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), startDelay);
+    return () => clearTimeout(t);
+  }, [startDelay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (lineIdx >= lines.length) return;
+    const line = lines[lineIdx];
+    if (charIdx < line.length) {
+      const t = setTimeout(() => {
+        setDisplayed(prev => prev + line[charIdx]);
+        setCharIdx(c => c + 1);
+      }, speed);
+      return () => clearTimeout(t);
+    } else if (lineIdx < lines.length - 1) {
+      const t = setTimeout(() => {
+        setDisplayed(prev => prev + "\n");
+        setLineIdx(l => l + 1);
+        setCharIdx(0);
+      }, 400);
+      return () => clearTimeout(t);
+    }
+  }, [started, lineIdx, charIdx, lines, speed]);
+
+  return (
+    <span style={{ ...style, whiteSpace: "pre" }}>
+      {displayed}
+      <span style={{ animation: "blink 1s step-end infinite", color: C.orange }}>|</span>
+    </span>
+  );
+}
+
+/* ── Floating Tech Background Elements ── */
+function FloatingTechBg() {
+  const isMobile = useIsMobile();
+  const icons = [
+    { icon: "🤖", x: "8%", y: "18%", size: 32, anim: "floatY", dur: "5.2s", delay: "0s" },
+    { icon: "🧠", x: "88%", y: "22%", size: 28, anim: "floatX", dur: "6.1s", delay: "1s" },
+    { icon: "⚡", x: "5%", y: "68%", size: 22, anim: "floatY", dur: "4.8s", delay: "0.5s" },
+    { icon: "🔬", x: "91%", y: "60%", size: 26, anim: "floatX", dur: "5.5s", delay: "2s" },
+    { icon: "🛸", x: "50%", y: "8%", size: 24, anim: "floatY", dur: "7s", delay: "1.5s" },
+    { icon: "💡", x: "20%", y: "85%", size: 20, anim: "floatX", dur: "4.5s", delay: "0.3s" },
+    { icon: "🔧", x: "78%", y: "88%", size: 22, anim: "floatY", dur: "5.8s", delay: "2.5s" },
+  ];
+  if (isMobile) return null;
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
+      {icons.map((it, i) => (
+        <div key={i} style={{
+          position: "absolute", left: it.x, top: it.y,
+          fontSize: it.size, opacity: 0.18,
+          animation: `${it.anim} ${it.dur} ease-in-out ${it.delay} infinite`,
+          filter: "saturate(0) brightness(2)",
+        }}>{it.icon}</div>
+      ))}
+      {/* Circuit corner decorations */}
+      <svg style={{ position: "absolute", bottom: 0, left: 0, opacity: 0.08 }} width="260" height="260" viewBox="0 0 260 260" fill="none">
+        <path d="M10 250 L10 80 L80 10 L250 10" stroke="#92b9d6" strokeWidth="1.5" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 0.5s infinite" }} />
+        <circle cx="10" cy="80" r="4" fill="#92b9d6" opacity="0.6" />
+        <circle cx="80" cy="10" r="4" fill="#f2932b" opacity="0.7" />
+        <path d="M40 250 L40 100 L100 40 L250 40" stroke="#23558a" strokeWidth="1" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1.2s infinite" }} />
+        <path d="M10 160 L60 160 L60 130 L120 130" stroke="#f2932b" strokeWidth="1" fill="none" strokeDasharray="200" style={{ animation: "circuitTrace 3s ease-out 2s infinite" }} />
+        <rect x="118" y="126" width="8" height="8" rx="2" fill="#f2932b" opacity="0.5" />
+        <rect x="6" y="76" width="8" height="8" rx="2" fill="#92b9d6" opacity="0.5" />
+      </svg>
+      <svg style={{ position: "absolute", top: 0, right: 0, opacity: 0.08 }} width="260" height="260" viewBox="0 0 260 260" fill="none">
+        <path d="M250 10 L250 180 L180 250 L10 250" stroke="#92b9d6" strokeWidth="1.5" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1s infinite" }} />
+        <circle cx="250" cy="180" r="4" fill="#92b9d6" opacity="0.6" />
+        <circle cx="180" cy="250" r="4" fill="#f2932b" opacity="0.7" />
+        <path d="M220 10 L220 160 L160 220 L10 220" stroke="#23558a" strokeWidth="1" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1.8s infinite" }} />
+      </svg>
+      {/* Hex grid accent top-right */}
+      <div style={{
+        position: "absolute", top: 80, right: 60, width: 180, height: 180,
+        background: "radial-gradient(circle, rgba(35,85,138,0.12) 0%, transparent 70%)",
+        animation: "hexPulse 5s ease-in-out infinite",
+        borderRadius: "50%",
+      }} />
+      {/* Hex grid accent bottom-left */}
+      <div style={{
+        position: "absolute", bottom: 100, left: 60, width: 140, height: 140,
+        background: "radial-gradient(circle, rgba(242,147,43,0.08) 0%, transparent 70%)",
+        animation: "hexPulse 6s ease-in-out 2s infinite",
+        borderRadius: "50%",
+      }} />
+    </div>
+  );
+}
+
+/* ── HUD Scan Line ── */
+function ScanLine() {
+  return (
+    <div style={{
+      position: "absolute", left: 0, right: 0, height: 2, zIndex: 1, pointerEvents: "none",
+      background: "linear-gradient(90deg, transparent 0%, rgba(146,185,214,0.5) 30%, rgba(242,147,43,0.7) 50%, rgba(146,185,214,0.5) 70%, transparent 100%)",
+      animation: "scanLine 8s ease-in-out 2s infinite",
+      top: 0,
+      boxShadow: "0 0 20px rgba(242,147,43,0.4)",
+    }} />
+  );
+}
+
+/* ── Stats Counter ── */
+function AnimatedStat({ value, label, index, style = {} }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    animate(ref.current, {
+      opacity: [0, 1],
+      translateY: [20, 0],
+      duration: 600,
+      delay: 1200 + index * 120,
+      ease: "outExpo",
+    });
+  }, [index]);
+  return (
+    <div ref={ref} style={{ opacity: 0, textAlign: "center", ...style }}>
+      {value}
+      {label}
+    </div>
+  );
+}
+
+
 const Avatar = ({ initials, bg, size = 44, radius = "50%", style = {} }) => (
   <div style={{ width: size, height: size, borderRadius: radius, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: size * 0.3, color: "#fff", flexShrink: 0, ...style }}>
     {initials}
@@ -133,68 +357,129 @@ const StatCard = ({ icon, value, label, trend, accent }) => (
 
 function Landing({ goTo }) {
   const isMobile = useIsMobile();
+  const heroRef = useRef(null);
+  const taglineRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  useEffect(() => {
+    // Animate tagline fade-in
+    if (taglineRef.current) {
+      animate(taglineRef.current, { opacity: [0, 1], translateY: [20, 0], duration: 900, delay: 900, ease: "outExpo" });
+    }
+    // Animate CTA buttons
+    if (ctaRef.current) {
+      animate(ctaRef.current.querySelectorAll("button"), {
+        opacity: [0, 1], translateY: [20, 0], duration: 700, delay: stagger(120, { start: 1300 }), ease: "outExpo",
+      });
+    }
+  }, []);
+
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+      {/* Matrix Rain */}
+      <MatrixRain opacity={0.22} />
+
       {/* ambient glows */}
-      <div style={{ position: "absolute", width: 800, height: 800, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,147,43,.07) 0%, transparent 65%)", top: -350, right: -250, pointerEvents: "none" }} />
-      <div style={{ position: "absolute", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(26,84,144,.1) 0%, transparent 65%)", bottom: -250, left: -150, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: 800, height: 800, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,147,43,.09) 0%, transparent 65%)", top: -350, right: -250, pointerEvents: "none", zIndex: 1 }} />
+      <div style={{ position: "absolute", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(35,85,138,.14) 0%, transparent 65%)", bottom: -250, left: -150, pointerEvents: "none", zIndex: 1 }} />
       {/* editorial grid overlay */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px)", backgroundSize: "80px 80px", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(146,185,214,.022) 1px, transparent 1px), linear-gradient(90deg, rgba(146,185,214,.022) 1px, transparent 1px)", backgroundSize: "80px 80px", pointerEvents: "none", zIndex: 1 }} />
+
+      {/* Floating tech elements */}
+      <FloatingTechBg />
+      {/* HUD Scan Line */}
+      <ScanLine />
 
       {/* NAV */}
-      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "16px 20px" : "24px 60px", position: "relative", zIndex: 2, borderBottom: `1px solid ${C.border}` }}>
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "16px 20px" : "24px 60px", position: "relative", zIndex: 10, borderBottom: `1px solid ${C.border}`, backdropFilter: "blur(8px)", background: "rgba(2,12,24,0.6)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, color: "#fff", letterSpacing: 1 }}>NX</div>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: `linear-gradient(135deg, ${C.orange}, #e07b1a)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 900, color: "#fff", letterSpacing: 1, fontFamily: "'Conthrax','Montserrat',sans-serif", animation: "glowPulse 3s ease-in-out infinite", boxShadow: `0 0 18px rgba(242,147,43,0.4)` }}>NX</div>
           <div>
-            <div style={{ fontSize: 21, fontWeight: 900, color: "#fff", letterSpacing: 3 }}>NEXA</div>
-            <div style={{ fontSize: 8, color: C.orange, letterSpacing: 3, textTransform: "uppercase", opacity: 0.7 }}>AI · Robotics · Coding</div>
+            <div className="nexa-logo-text" style={{ fontSize: 21, fontWeight: 700, color: "#fff", letterSpacing: 4 }}>NEXA</div>
+            <div style={{ fontSize: 8, color: C.orange, letterSpacing: 3, textTransform: "uppercase", opacity: 0.8, fontFamily: "'Montserrat',sans-serif" }}>AI · Robotics · Coding</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: isMobile ? 8 : 10 }}>
           <Btn variant="outline" style={isMobile ? { padding: "9px 14px", fontSize: 12 } : {}} onClick={() => goTo("login")}>Log In</Btn>
-          <Btn variant="primary" style={isMobile ? { padding: "9px 14px", fontSize: 12 } : {}} onClick={() => goTo("signup")}>Join NEXA</Btn>
+          <Btn variant="primary" style={{ ...(isMobile ? { padding: "9px 14px", fontSize: 12 } : {}), animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("signup")}>Join NEXA</Btn>
         </div>
       </nav>
 
       {/* HERO */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: isMobile ? "40px 20px 60px" : "60px 40px 80px", position: "relative", zIndex: 2 }}>
+      <div ref={heroRef} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: isMobile ? "40px 20px 60px" : "60px 40px 80px", position: "relative", zIndex: 5 }}>
         {/* editorial issue marker */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 40 }}>
-          <div style={{ height: 1, width: 44, background: C.orange, opacity: 0.5 }} />
-          <span style={{ fontSize: 9, fontWeight: 700, color: C.orange, letterSpacing: 4, textTransform: "uppercase" }}>Cairo, Egypt · Est. 2025 · Vol. I</span>
-          <div style={{ height: 1, width: 44, background: C.orange, opacity: 0.5 }} />
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 12, marginBottom: 36, animation: "fadeInUp 0.7s ease 0.2s both" }}>
+          <div style={{ height: 1, width: 44, background: `linear-gradient(90deg, transparent, ${C.orange})`, opacity: 0.8 }} />
+          <span style={{ fontSize: 9, fontWeight: 700, color: C.orange, letterSpacing: 4, textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif" }}>Cairo, Egypt · Est. 2025 · Vol. I</span>
+          <div style={{ height: 1, width: 44, background: `linear-gradient(90deg, ${C.orange}, transparent)`, opacity: 0.8 }} />
         </div>
 
-        {/* headline */}
-        <h1 style={{ fontSize: "clamp(54px,9vw,100px)", fontWeight: 900, color: "#fff", letterSpacing: 8, lineHeight: 0.92, margin: 0 }}>NEXA</h1>
-        <h1 style={{ fontSize: "clamp(54px,9vw,100px)", fontWeight: 900, color: C.orange, letterSpacing: 8, lineHeight: 1, margin: "0 0 10px" }}>TECH</h1>
-        <div style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "rgba(255,255,255,.22)", letterSpacing: 10, textTransform: "uppercase", marginBottom: 32, fontWeight: 300 }}>— School —</div>
+        {/* headline — anime.js letter animation */}
+        <h1 style={{ margin: 0, lineHeight: 0.92 }}>
+          <AnimatedLetters
+            text="NEXA"
+            style={{ fontSize: "clamp(54px,9vw,104px)", fontFamily: "'Conthrax','Montserrat',sans-serif", fontWeight: 700, color: "#fff", letterSpacing: isMobile ? 6 : 10, display: "block" }}
+            animDelay={200}
+            animFrom="bottom"
+          />
+        </h1>
+        <h1 style={{ margin: "0 0 10px" }}>
+          <AnimatedLetters
+            text="TECH"
+            style={{ fontSize: "clamp(54px,9vw,104px)", fontFamily: "'Conthrax','Montserrat',sans-serif", fontWeight: 700, letterSpacing: isMobile ? 6 : 10, display: "block" }}
+            letterStyle={{ color: C.orange }}
+            animDelay={450}
+            animFrom="bottom"
+          />
+        </h1>
+        <div style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "rgba(255,255,255,.22)", letterSpacing: 10, textTransform: "uppercase", marginBottom: 28, fontWeight: 300, fontFamily: "'Montserrat',sans-serif", animation: "fadeInUp 0.8s ease 0.8s both" }}>— School —</div>
 
         {/* editorial rule */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", maxWidth: 520, marginBottom: 32 }}>
-          <div style={{ flex: 1, height: 1, background: C.border }} />
-          <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.orange, display: "inline-block", flexShrink: 0 }} />
-          <div style={{ flex: 1, height: 1, background: C.border }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", maxWidth: 520, marginBottom: 28, animation: "fadeInUp 0.7s ease 0.85s both" }}>
+          <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${C.sky})`, opacity: 0.4 }} />
+          <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.orange, display: "inline-block", flexShrink: 0, animation: "pulseGlow 2s ease-in-out infinite" }} />
+          <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${C.sky}, transparent)`, opacity: 0.4 }} />
         </div>
 
-        <p style={{ fontSize: isMobile ? 16 : 18, color: "rgba(255,255,255,.48)", fontWeight: 300, fontStyle: "italic", maxWidth: 480, lineHeight: 1.75, marginBottom: 48 }}>
-          We don't teach technology…<br />We build creators.
-        </p>
-
-        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 14, width: isMobile ? "100%" : "auto", maxWidth: isMobile ? 320 : "none" }}>
-          <Btn variant="primary" style={{ padding: "14px 38px", fontSize: 14, borderRadius: 50, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("signup")}>Create Account</Btn>
-          <Btn variant="outline" style={{ padding: "14px 38px", fontSize: 14, borderRadius: 50, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("login")}>Sign In</Btn>
+        {/* Typewriter tagline */}
+        <div ref={taglineRef} style={{ opacity: 0, marginBottom: 36, maxWidth: 480 }}>
+          <p style={{ fontSize: isMobile ? 15 : 17, color: "rgba(255,255,255,.50)", fontWeight: 300, fontStyle: "italic", lineHeight: 1.8, margin: 0, fontFamily: "'Montserrat',sans-serif" }}>
+            We don't teach technology…<br />
+            <span style={{ fontFamily: "'Riffic Free','Montserrat',sans-serif", color: C.sky, fontStyle: "normal", fontSize: isMobile ? 13 : 15 }}>We build creators.</span>
+          </p>
         </div>
 
-        {/* stats */}
-        <div style={{ display: "flex", gap: 0, marginTop: 72, flexWrap: "wrap", justifyContent: "center", borderTop: `1px solid ${C.border}`, paddingTop: 44, width: "100%", maxWidth: 600 }}>
-          {[["3", "Year Program"], ["432", "Total Hours"], ["4", "Systems"], ["6–17", "Age Range"]].map(([n, l], i) => (
-            <div key={i} style={{ textAlign: "center", padding: isMobile ? "0 16px" : "0 36px", borderRight: i < 3 ? `1px solid ${C.border}` : "none" }}>
-              <div style={{ fontSize: 36, fontWeight: 900, color: C.orange, letterSpacing: 2 }}>{n}</div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,.28)", letterSpacing: 3, textTransform: "uppercase", marginTop: 5 }}>{l}</div>
+        {/* Specializations chips */}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", marginBottom: 36, animation: "fadeInUp 0.7s ease 1.1s both" }}>
+          {[["🤖", "Robotics"], ["🧠", "AI & ML"], ["💻", "Coding"], ["⚡", "Electronics"]].map(([ic, label]) => (
+            <div key={label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 16px", borderRadius: 50, border: `1px solid ${C.border}`, background: "rgba(35,85,138,0.15)", backdropFilter: "blur(4px)", fontSize: 12, fontWeight: 600, color: C.sky, fontFamily: "'Montserrat',sans-serif" }}>
+              <span>{ic}</span><span>{label}</span>
             </div>
           ))}
         </div>
+
+        <div ref={ctaRef} style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 14, width: isMobile ? "100%" : "auto", maxWidth: isMobile ? 320 : "none" }}>
+          <Btn variant="primary" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, background: `linear-gradient(135deg, ${C.orange}, #e07b1a)`, boxShadow: `0 4px 24px rgba(242,147,43,0.4)`, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("signup")}>Create Account</Btn>
+          <Btn variant="outline" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, border: `1.5px solid rgba(146,185,214,0.3)`, backdropFilter: "blur(4px)", ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("login")}>Sign In</Btn>
+        </div>
+
+        {/* stats */}
+        <div style={{ display: "flex", gap: 0, marginTop: 64, flexWrap: "wrap", justifyContent: "center", borderTop: `1px solid ${C.border}`, paddingTop: 40, width: "100%", maxWidth: 600 }}>
+          {[["3", "Year Program"], ["432", "Total Hours"], ["4", "Systems"], ["6–17", "Age Range"]].map(([n, l], i) => (
+            <AnimatedStat key={i} index={i}
+              style={{ padding: isMobile ? "0 14px" : "0 34px", borderRight: i < 3 ? `1px solid ${C.border}` : "none" }}
+              value={<div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: C.orange, letterSpacing: 2, fontFamily: "'Conthrax','Montserrat',sans-serif" }}>{n}</div>}
+              label={<div style={{ fontSize: 9, color: "rgba(255,255,255,.28)", letterSpacing: 3, textTransform: "uppercase", marginTop: 5, fontFamily: "'Montserrat',sans-serif" }}>{l}</div>}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div style={{ position: "relative", zIndex: 5, textAlign: "center", padding: "12px 20px", borderTop: `1px solid ${C.border}`, background: "rgba(2,12,24,0.7)", backdropFilter: "blur(8px)" }}>
+        <span style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif" }}>
+          NEXA Tech School · Cairo, Egypt · AI · Robotics · Coding · Est. 2025
+        </span>
       </div>
     </div>
   );
@@ -210,8 +495,12 @@ function RolePicker({ mode, onSelect }) {
   ];
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-      <div style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,147,43,.08) 0%, transparent 70%)", top: -150, right: -100, pointerEvents: "none" }} />
+      <MatrixRain opacity={0.10} />
+      <div style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,147,43,.08) 0%, transparent 70%)", top: -150, right: -100, pointerEvents: "none", zIndex: 1 }} />
       <div style={{ background: C.bgCard, borderRadius: 20, padding: "40px 36px", maxWidth: 460, width: "90%", position: "relative", zIndex: 2, border: `1px solid ${C.border}`, boxShadow: "0 20px 60px rgba(0,0,0,.6)" }}>
+        <div style={{ textAlign: "center", marginBottom: 4 }}>
+          <div className="nexa-logo-text" style={{ fontSize: 22, fontWeight: 700, color: C.orange, letterSpacing: 4 }}>NEXA</div>
+        </div>
         <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 6, textAlign: "center" }}>
           {mode === "login" ? "How are you signing in?" : "Who are you?"}
         </div>
@@ -221,7 +510,7 @@ function RolePicker({ mode, onSelect }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
           {roles.map(r => (
             <div key={r.id} onClick={() => setRole(r.id)}
-              style={{ border: `2px solid ${role === r.id ? C.orange : C.border}`, background: role === r.id ? "rgba(242,147,43,.08)" : C.bgElevated, borderRadius: 14, padding: "20px 12px", cursor: "pointer", textAlign: "center", transition: "all .2s" }}>
+              style={{ border: `2px solid ${role === r.id ? C.orange : C.border}`, background: role === r.id ? "rgba(242,147,43,.08)" : C.bgElevated, borderRadius: 14, padding: "20px 12px", cursor: "pointer", textAlign: "center", transition: "all .2s", boxShadow: role === r.id ? `0 0 16px rgba(242,147,43,0.2)` : "none" }}>
               <div style={{ fontSize: 30, marginBottom: 8 }}>{r.icon}</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 3 }}>{r.title}</div>
               <div style={{ fontSize: 10, color: C.textMuted }}>{r.desc}</div>
@@ -250,15 +539,16 @@ function LoginPage({ role, goTo, onLogin }) {
     setEmail(r + "@nexa.com"); setPass("demo1234"); setErr("");
   }
 
-  return (
+    return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "45%", background: "linear-gradient(180deg, rgba(13,58,110,.35) 0%, transparent 100%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,147,43,.06) 0%, transparent 65%)", top: -200, right: -150, pointerEvents: "none" }} />
+      <MatrixRain opacity={0.10} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "45%", background: "linear-gradient(180deg, rgba(0,43,81,.35) 0%, transparent 100%)", pointerEvents: "none", zIndex: 1 }} />
+      <div style={{ position: "absolute", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(242,147,43,.06) 0%, transparent 65%)", top: -200, right: -150, pointerEvents: "none", zIndex: 1 }} />
       <div style={{ background: C.bgCard, borderRadius: 22, padding: "40px 44px", width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,.7)", border: `1px solid ${C.border}`, position: "relative", zIndex: 2 }}>
         {/* logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 11, justifyContent: "center", marginBottom: 6 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 10, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff" }}>NX</div>
-          <div><div style={{ fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: 3 }}>NEXA</div><div style={{ fontSize: 8, color: C.textMuted, letterSpacing: 2 }}>AI · ROBOTICS · CODING</div></div>
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: `linear-gradient(135deg,${C.orange},#e07b1a)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "'Conthrax','Montserrat',sans-serif", boxShadow: `0 0 14px rgba(242,147,43,0.35)` }}>NX</div>
+          <div><div className="nexa-logo-text" style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: 4 }}>NEXA</div><div style={{ fontSize: 8, color: C.textMuted, letterSpacing: 2, fontFamily: "'Montserrat',sans-serif" }}>AI · ROBOTICS · CODING</div></div>
         </div>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <Tag color="navy">{icons[role]}</Tag>
@@ -334,11 +624,12 @@ function SignupPage({ role, goTo, onSignup }) {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", padding: "40px 20px" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "45%", background: "linear-gradient(180deg, rgba(13,58,110,.3) 0%, transparent 100%)", pointerEvents: "none" }} />
+      <MatrixRain opacity={0.10} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "45%", background: "linear-gradient(180deg, rgba(0,43,81,.3) 0%, transparent 100%)", pointerEvents: "none", zIndex: 1 }} />
       <div style={{ background: C.bgCard, borderRadius: 22, padding: "36px 40px", width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,.7)", border: `1px solid ${C.border}`, position: "relative", zIndex: 2, maxHeight: "88vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, justifyContent: "center", marginBottom: 6 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 10, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 900, color: "#fff" }}>NX</div>
-          <div><div style={{ fontSize: 22, fontWeight: 900, color: C.text, letterSpacing: 3 }}>NEXA</div><div style={{ fontSize: 8, color: C.textMuted, letterSpacing: 2 }}>AI · ROBOTICS · CODING</div></div>
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: `linear-gradient(135deg,${C.orange},#e07b1a)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", fontFamily: "'Conthrax','Montserrat',sans-serif", boxShadow: `0 0 14px rgba(242,147,43,0.35)` }}>NX</div>
+          <div><div className="nexa-logo-text" style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: 4 }}>NEXA</div><div style={{ fontSize: 8, color: C.textMuted, letterSpacing: 2, fontFamily: "'Montserrat',sans-serif" }}>AI · ROBOTICS · CODING</div></div>
         </div>
         <div style={{ textAlign: "center", marginBottom: 22 }}>
           <Tag color="navy">{icons[role]}</Tag>
@@ -465,8 +756,8 @@ function Shell({ sidebarItems, user, onHome, pageTitle, topRight, children }) {
       {/* sidebar */}
       <div style={{ width: 252, minHeight: "100vh", background: C.bgCard, display: "flex", flexDirection: "column", padding: "22px 0", position: "fixed", top: 0, left: 0, zIndex: 100, borderRight: `1px solid ${C.border}`, transform: isMobile && !sidebarOpen ? "translateX(-100%)" : "translateX(0)", transition: "transform .25s ease" }}>
         <div style={{ padding: "0 20px 22px", borderBottom: `1px solid ${C.border}`, marginBottom: 14, display: "flex", alignItems: "center", gap: 11 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 9, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: "#fff" }}>NX</div>
-          <div><div style={{ fontSize: 16, fontWeight: 900, color: "#fff", letterSpacing: 2 }}>NEXA</div><div style={{ fontSize: 8, color: "rgba(255,255,255,.3)", letterSpacing: 2 }}>{user.subtitle}</div></div>
+          <div style={{ width: 36, height: 36, borderRadius: 9, background: `linear-gradient(135deg,${C.orange},#e07b1a)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff", fontFamily: "'Conthrax','Montserrat',sans-serif", boxShadow: `0 0 10px rgba(242,147,43,0.3)` }}>NX</div>
+          <div><div className="nexa-logo-text" style={{ fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: 3 }}>NEXA</div><div style={{ fontSize: 8, color: "rgba(255,255,255,.3)", letterSpacing: 2, fontFamily: "'Montserrat',sans-serif" }}>{user.subtitle}</div></div>
           {isMobile && (
             <button onClick={() => setSidebarOpen(false)} style={{ marginLeft: "auto", background: "none", border: "none", color: "rgba(255,255,255,.5)", fontSize: 20, cursor: "pointer", padding: 0 }}>✕</button>
           )}
