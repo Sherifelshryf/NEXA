@@ -1,5 +1,62 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { animate, stagger } from "animejs";
+import { createClient } from "@supabase/supabase-js";
+
+/* ══════════════════════════════════════════
+   SUPABASE CLIENT
+══════════════════════════════════════════ */
+const SUPA_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const SUPA_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const supabase = SUPA_URL && SUPA_KEY ? createClient(SUPA_URL, SUPA_KEY) : null;
+
+async function bootstrapSchema() {
+  if (!supabase) return;
+  const { error } = await supabase.from("profiles").select("id").limit(1);
+  if (error) console.error("NEXA: DB connection check failed:", error.message);
+}
+
+function useAuth(onSignIn) {
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const onSignInRef = useRef(onSignIn);
+  useEffect(() => { onSignInRef.current = onSignIn; });
+
+  const fetchProfile = useCallback(async (userId) => {
+    if (!supabase || !userId) return null;
+    const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
+    setProfile(data || null);
+    if (data && onSignInRef.current) onSignInRef.current(data);
+    return data || null;
+  }, []);
+
+  useEffect(() => {
+    bootstrapSchema();
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s);
+      if (s?.user?.id) fetchProfile(s.user.id);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      if (s?.user?.id) fetchProfile(s.user.id);
+      else setProfile(null);
+    });
+    return () => subscription.unsubscribe();
+  }, [fetchProfile]);
+
+  return { session, profile };
+}
+
+function toast(msg, type = "info") {
+  // Lightweight console-based notification (can be replaced with a UI toast library)
+  const prefix = type === "error" ? "❌" : type === "success" ? "✅" : "ℹ️";
+  console.log(`${prefix} NEXA: ${msg}`);
+}
+
+function initials(name) {
+  if (!name) return "??";
+  return name.trim().split(/\s+/).filter(w => w).map(w => w[0]).join("").toUpperCase().slice(0, 2);
+}
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < breakpoint);
@@ -529,11 +586,28 @@ function LoginPage({ role, goTo, onLogin }) {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
   const icons = { parent: "👨‍👩‍👧 Parent", student: "🎓 Student", instructor: "👨‍🏫 Instructor" };
 
-  function doLogin() {
+  async function doLogin() {
     if (!email || !pass) { setErr("Please enter your email and password."); return; }
-    onLogin(role);
+    setErr(""); setLoading(true);
+    if (supabase) {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      setLoading(false);
+      if (error) { setErr(error.message); return; }
+      let profile = null;
+      if (data.user) {
+        const { data: p } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
+        profile = p;
+      }
+      const resolvedRole = profile?.role || role;
+      const name = profile ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() : "";
+      onLogin(resolvedRole, { name: name || undefined, initials: name ? initials(name) : undefined, avatarUrl: profile?.avatar_url });
+    } else {
+      setLoading(false);
+      onLogin(role);
+    }
   }
   function quickFill(r) {
     setEmail(r + "@nexa.com"); setPass("demo1234"); setErr("");
@@ -558,7 +632,7 @@ function LoginPage({ role, goTo, onLogin }) {
         {err && <div style={{ background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#f87171", marginBottom: 14 }}>{err}</div>}
         <Input label="Email Address" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} />
         <Input label="Password" type="password" placeholder="••••••••" value={pass} onChange={e => setPass(e.target.value)} />
-        <Btn variant="navy" block style={{ marginTop: 6 }} onClick={doLogin}>Sign In to Portal</Btn>
+        <Btn variant="navy" block style={{ marginTop: 6 }} onClick={doLogin}>{loading ? "Signing in…" : "Sign In to Portal"}</Btn>
         <div style={{ textAlign: "center", marginTop: 14, fontSize: 11, color: C.textMuted }}>
           Demo: {" "}
           <span style={{ color: C.orangeLight, fontWeight: 700, cursor: "pointer" }} onClick={() => quickFill("parent")}>Parent</span> · {" "}
@@ -584,6 +658,8 @@ function SignupPage({ role, goTo, onSignup }) {
   const [searchRes, setSearchRes] = useState([]);
   const [err, setErr] = useState("");
   const [ok, setOk] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
 
   const f = (k) => form[k] || "";
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
@@ -600,7 +676,7 @@ function SignupPage({ role, goTo, onSignup }) {
   }
   function removeChild(id) { setLinked(p => p.filter(c => c.id !== id)); }
 
-  function submit() {
+  async function submit() {
     setErr(""); setOk("");
     if (role === "parent") {
       if (!f("fname") || !f("lname") || !f("email") || !f("pass")) { setErr("Please fill in all required fields."); return; }
@@ -611,12 +687,67 @@ function SignupPage({ role, goTo, onSignup }) {
     } else {
       if (!f("fname") || !f("lname") || !f("email") || !f("pass") || !f("subject")) { setErr("Please fill in all required fields."); return; }
     }
-    if (role === "instructor") {
-      setOk("Application submitted! You'll be notified within 24 hours.");
-      setTimeout(() => onSignup(role, form), 1800);
+
+    if (supabase) {
+      setLoading(true);
+      const fullName = `${f("fname")} ${f("lname")}`.trim();
+      const { data, error } = await supabase.auth.signUp({
+        email: f("email"),
+        password: f("pass"),
+        options: { data: { full_name: fullName, role } },
+      });
+      if (error) { setLoading(false); setErr(error.message); return; }
+
+      let avatarUrl = null;
+      if (avatarFile && data.user) {
+        const nameParts = avatarFile.name.split(".");
+        const ext = nameParts.length > 1 ? nameParts.pop() : "jpg";
+        const path = `${data.user.id}/avatar.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from("avatars").upload(path, avatarFile, { upsert: true });
+        if (uploadErr) {
+          toast("Failed to upload avatar: " + uploadErr.message, "error");
+        } else {
+          const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+          avatarUrl = urlData?.publicUrl || null;
+        }
+      }
+
+      if (data.user) {
+        const studentFields = role === "student" ? { age: f("age") || null, parent_name: f("parentName") || null, parent_phone: f("parentPhone") || null, parent_email: f("parentEmail") || null } : {};
+        const instructorFields = role === "instructor" ? { subject: f("subject") || null, status: "pending" } : {};
+        await supabase.from("profiles").insert({
+          id: data.user.id,
+          first_name: f("fname"),
+          last_name: f("lname"),
+          email: f("email"),
+          phone: f("phone") || null,
+          role,
+          avatar_url: avatarUrl,
+          ...studentFields,
+          ...instructorFields,
+        });
+      }
+
+      setLoading(false);
+      const name = fullName;
+      if (role === "instructor") {
+        toast("Application submitted! You'll be notified within 24 hours.", "success");
+        setOk("Application submitted! You'll be notified within 24 hours.");
+        setTimeout(() => onSignup(role, { ...form, name, initials: initials(name), avatarUrl }), 1800);
+      } else {
+        toast("Account created! Redirecting…", "success");
+        setOk("Account created! Redirecting…");
+        setTimeout(() => onSignup(role, { ...form, name, initials: initials(name), avatarUrl }), 1000);
+      }
     } else {
-      setOk("Account created! Redirecting…");
-      setTimeout(() => onSignup(role, form), 1000);
+      // Fallback when Supabase is not configured
+      if (role === "instructor") {
+        setOk("Application submitted! You'll be notified within 24 hours.");
+        setTimeout(() => onSignup(role, form), 1800);
+      } else {
+        setOk("Account created! Redirecting…");
+        setTimeout(() => onSignup(role, form), 1000);
+      }
     }
   }
 
@@ -696,8 +827,23 @@ function SignupPage({ role, goTo, onSignup }) {
           </div>
         </>}
 
+        {/* AVATAR UPLOAD (optional, all roles) */}
+        <Divider label="Profile Photo (optional)" />
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: C.textMid, marginBottom: 6, letterSpacing: 1.5, textTransform: "uppercase" }}>
+            Upload Avatar <span style={{ fontWeight: 400, color: C.textMuted }}>(optional)</span>
+          </label>
+          <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" onChange={e => {
+            const file = e.target.files[0] || null;
+            if (file && file.size > 5 * 1024 * 1024) { setErr("Avatar image must be under 5 MB."); e.target.value = ""; return; }
+            setAvatarFile(file);
+          }}
+            style={{ width: "100%", padding: "10px 14px", border: `1.5px solid ${C.border}`, borderRadius: 8, fontFamily: "'Montserrat',sans-serif", fontSize: 12, color: C.text, background: C.bgSurface, boxSizing: "border-box", cursor: "pointer" }} />
+          {avatarFile && <div style={{ fontSize: 11, color: C.orangeLight, marginTop: 5 }}>📎 {avatarFile.name}</div>}
+        </div>
+
         <Btn variant="primary" block onClick={submit}>
-          {role === "instructor" ? "Submit Application" : "Create Account →"}
+          {loading ? "Please wait…" : role === "instructor" ? "Submit Application" : "Create Account →"}
         </Btn>
         <div style={{ textAlign: "center", marginTop: 14, fontSize: 11, color: C.textMuted }}>
           Already have an account? <span style={{ color: C.orange, fontWeight: 700, cursor: "pointer" }} onClick={() => goTo("login")}>Sign in →</span>
@@ -1233,6 +1379,19 @@ export default function App() {
   const [selectedRole, setSelectedRole] = useState(null);
   const [currentUser, setCurrentUser] = useState({});
 
+  // Restore session from Supabase if the user is already authenticated
+  const hasNavigatedRef = useRef(false);
+  useAuth((profile) => {
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+    const role = profile.role || "parent";
+    const name = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
+    setCurrentUser({ name: name || undefined, initials: name ? initials(name) : undefined, avatarUrl: profile.avatar_url });
+    if (role === "parent") setScreen("parent-home");
+    else if (role === "student") setScreen("student-home");
+    else setScreen("instructor-home");
+  });
+
   function goTo(dest) {
     if (dest === "login") { setRolePickMode("login"); setScreen("role-pick"); }
     else if (dest === "signup") { setRolePickMode("signup"); setScreen("role-pick"); }
@@ -1245,7 +1404,15 @@ export default function App() {
     setScreen(rolePickMode === "login" ? "login" : "signup");
   }
 
-  function onLogin(role) {
+  function onLogin(role, userData) {
+    if (userData) {
+      setCurrentUser(prev => ({
+        ...prev,
+        name: userData.name || prev.name,
+        initials: userData.initials || prev.initials,
+        avatarUrl: userData.avatarUrl || prev.avatarUrl,
+      }));
+    }
     if (role === "parent") setScreen("parent-home");
     else if (role === "student") setScreen("student-home");
     else setScreen("instructor-home");
@@ -1254,9 +1421,9 @@ export default function App() {
   function onSignup(role, formData) {
     const first = formData.fname || "";
     const last = formData.lname || "";
-    const name = first && last ? `${first} ${last}` : (role === "instructor" ? "Eng. Tarek Mohamed" : role === "student" ? "Omar Ahmed" : "Ahmed Hassan");
-    const initials = first && last ? (first[0] + last[0]).toUpperCase() : role === "instructor" ? "TM" : role === "student" ? "OM" : "AH";
-    setCurrentUser({ name, initials });
+    const name = formData.name || (first && last ? `${first} ${last}` : (role === "instructor" ? "Eng. Tarek Mohamed" : role === "student" ? "Omar Ahmed" : "Ahmed Hassan"));
+    const inits = formData.initials || (first && last ? (first[0] + last[0]).toUpperCase() : role === "instructor" ? "TM" : role === "student" ? "OM" : "AH");
+    setCurrentUser({ name, initials: inits, avatarUrl: formData.avatarUrl || null });
     if (role === "parent") setScreen("parent-home");
     else if (role === "student") setScreen("student-home");
     else setScreen("instructor-home");
