@@ -180,7 +180,6 @@ function MatrixRain({ opacity = 0.18 }) {
   const { isDark } = useTheme();
   const canvasRef = useRef(null);
   useEffect(() => {
-    if (!isDark) return; // No matrix rain in light mode
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
     let animId;
@@ -192,15 +191,26 @@ function MatrixRain({ opacity = 0.18 }) {
     }
     resize(); window.addEventListener("resize", resize);
     const chars = "アイウエカキクタナハマ01010011<>{}()=+-*/0x9FA3B2C1def function class import return yield async await AI ML NLP CNN RNN 0x1A 0xFF π∑∫∂∇Ω∈";
+
+    // dark mode: fade with dark bg; light mode: fade with light bg
+    const fadeFill = isDark ? "rgba(2,12,24,0.055)" : "rgba(240,244,248,0.065)";
+
     function draw() {
-      ctx.fillStyle = "rgba(2,12,24,0.055)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = fadeFill; ctx.fillRect(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < drops.length; i++) {
         const idx = Math.floor(Math.random() * chars.length); const char = chars[idx];
         const x = i * fontSize; const y = drops[i] * fontSize;
         const isLead = Math.random() > 0.94; const isKeyword = idx > 40 && idx < 80;
-        if (isLead) { ctx.fillStyle = "#92b9d6"; ctx.shadowColor = "#92b9d6"; ctx.shadowBlur = 8; }
-        else if (isKeyword) { ctx.fillStyle = "rgba(242,147,43,0.6)"; ctx.shadowBlur = 0; }
-        else { ctx.fillStyle = "rgba(35,85,138,0.7)"; ctx.shadowBlur = 0; }
+        if (isDark) {
+          if (isLead) { ctx.fillStyle = "#92b9d6"; ctx.shadowColor = "#92b9d6"; ctx.shadowBlur = 8; }
+          else if (isKeyword) { ctx.fillStyle = "rgba(242,147,43,0.6)"; ctx.shadowBlur = 0; }
+          else { ctx.fillStyle = "rgba(35,85,138,0.7)"; ctx.shadowBlur = 0; }
+        } else {
+          // light mode — use navy and orange on light bg
+          if (isLead) { ctx.fillStyle = "rgba(26,74,138,0.55)"; ctx.shadowColor = "rgba(26,74,138,0.4)"; ctx.shadowBlur = 6; }
+          else if (isKeyword) { ctx.fillStyle = "rgba(201,106,10,0.45)"; ctx.shadowBlur = 0; }
+          else { ctx.fillStyle = "rgba(37,99,168,0.28)"; ctx.shadowBlur = 0; }
+        }
         ctx.font = `${fontSize}px 'Courier New', monospace`; ctx.fillText(char, x, y); ctx.shadowBlur = 0;
         if (y > canvas.height && Math.random() > 0.972) drops[i] = 0;
         drops[i] += 0.5;
@@ -210,8 +220,7 @@ function MatrixRain({ opacity = 0.18 }) {
     draw();
     return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
   }, [isDark]);
-  if (!isDark) return null;
-  return <canvas ref={canvasRef} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", opacity, pointerEvents: "none", zIndex: 0 }} />;
+  return <canvas ref={canvasRef} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", opacity: isDark ? opacity : opacity * 0.7, pointerEvents: "none", zIndex: 0 }} />;
 }
 
 function AnimatedLetters({ text, style = {}, letterStyle = {}, animDelay = 0, animFrom = "bottom" }) {
@@ -245,21 +254,47 @@ function FloatingTechBg() {
   const { isDark } = useTheme();
   const icons = [{ icon: "🤖", x: "8%", y: "18%", size: 32, anim: "floatY", dur: "5.2s", delay: "0s" }, { icon: "🧠", x: "88%", y: "22%", size: 28, anim: "floatX", dur: "6.1s", delay: "1s" }, { icon: "⚡", x: "5%", y: "68%", size: 22, anim: "floatY", dur: "4.8s", delay: "0.5s" }, { icon: "🔬", x: "91%", y: "60%", size: 26, anim: "floatX", dur: "5.5s", delay: "2s" }, { icon: "🛸", x: "50%", y: "8%", size: 24, anim: "floatY", dur: "7s", delay: "1.5s" }, { icon: "💡", x: "20%", y: "85%", size: 20, anim: "floatX", dur: "4.5s", delay: "0.3s" }, { icon: "🔧", x: "78%", y: "88%", size: 22, anim: "floatY", dur: "5.8s", delay: "2.5s" }];
   if (isMobile) return null;
+
+  // Light mode circuit colors — navy & orange on light bg
+  const circuitStroke1 = isDark ? "#92b9d6" : "#2563a8";
+  const circuitStroke2 = isDark ? "#23558a" : "#1a4a7a";
+  const circuitOrange  = isDark ? "#f2932b" : "#c96a0a";
+  const svgOpacity     = isDark ? 0.08 : 0.18;
+  const pulseOpacity1  = isDark ? "0.12" : "0.10";
+  const pulseOpacity2  = isDark ? "0.08" : "0.07";
+
   return (
     <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
-      {icons.map((it, i) => <div key={i} style={{ position: "absolute", left: it.x, top: it.y, fontSize: it.size, opacity: isDark ? 0.18 : 0.12, animation: `${it.anim} ${it.dur} ease-in-out ${it.delay} infinite`, filter: isDark ? "saturate(0) brightness(2)" : "saturate(0.5) brightness(0.8)" }}>{it.icon}</div>)}
-      <svg style={{ position: "absolute", bottom: 0, left: 0, opacity: isDark ? 0.08 : 0.06 }} width="260" height="260" viewBox="0 0 260 260" fill="none"><path d="M10 250 L10 80 L80 10 L250 10" stroke="#92b9d6" strokeWidth="1.5" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 0.5s infinite" }} /><circle cx="10" cy="80" r="4" fill="#92b9d6" opacity="0.6" /><circle cx="80" cy="10" r="4" fill="#f2932b" opacity="0.7" /><path d="M40 250 L40 100 L100 40 L250 40" stroke="#23558a" strokeWidth="1" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1.2s infinite" }} /><path d="M10 160 L60 160 L60 130 L120 130" stroke="#f2932b" strokeWidth="1" fill="none" strokeDasharray="200" style={{ animation: "circuitTrace 3s ease-out 2s infinite" }} /><rect x="118" y="126" width="8" height="8" rx="2" fill="#f2932b" opacity="0.5" /><rect x="6" y="76" width="8" height="8" rx="2" fill="#92b9d6" opacity="0.5" /></svg>
-      <svg style={{ position: "absolute", top: 0, right: 0, opacity: isDark ? 0.08 : 0.06 }} width="260" height="260" viewBox="0 0 260 260" fill="none"><path d="M250 10 L250 180 L180 250 L10 250" stroke="#92b9d6" strokeWidth="1.5" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1s infinite" }} /><circle cx="250" cy="180" r="4" fill="#92b9d6" opacity="0.6" /><circle cx="180" cy="250" r="4" fill="#f2932b" opacity="0.7" /></svg>
-      <div style={{ position: "absolute", top: 80, right: 60, width: 180, height: 180, background: `radial-gradient(circle, rgba(35,85,138,${isDark ? "0.12" : "0.06"}) 0%, transparent 70%)`, animation: "hexPulse 5s ease-in-out infinite", borderRadius: "50%" }} />
-      <div style={{ position: "absolute", bottom: 100, left: 60, width: 140, height: 140, background: `radial-gradient(circle, rgba(242,147,43,${isDark ? "0.08" : "0.05"}) 0%, transparent 70%)`, animation: "hexPulse 6s ease-in-out 2s infinite", borderRadius: "50%" }} />
+      {icons.map((it, i) => <div key={i} style={{ position: "absolute", left: it.x, top: it.y, fontSize: it.size, opacity: isDark ? 0.18 : 0.22, animation: `${it.anim} ${it.dur} ease-in-out ${it.delay} infinite`, filter: isDark ? "saturate(0) brightness(2)" : "saturate(0.7) brightness(0.85)" }}>{it.icon}</div>)}
+      <svg style={{ position: "absolute", bottom: 0, left: 0, opacity: svgOpacity }} width="260" height="260" viewBox="0 0 260 260" fill="none">
+        <path d="M10 250 L10 80 L80 10 L250 10" stroke={circuitStroke1} strokeWidth="1.5" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 0.5s infinite" }} />
+        <circle cx="10" cy="80" r="4" fill={circuitStroke1} opacity="0.7" />
+        <circle cx="80" cy="10" r="4" fill={circuitOrange} opacity="0.8" />
+        <path d="M40 250 L40 100 L100 40 L250 40" stroke={circuitStroke2} strokeWidth="1" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1.2s infinite" }} />
+        <path d="M10 160 L60 160 L60 130 L120 130" stroke={circuitOrange} strokeWidth="1" fill="none" strokeDasharray="200" style={{ animation: "circuitTrace 3s ease-out 2s infinite" }} />
+        <rect x="118" y="126" width="8" height="8" rx="2" fill={circuitOrange} opacity="0.6" />
+        <rect x="6" y="76" width="8" height="8" rx="2" fill={circuitStroke1} opacity="0.6" />
+      </svg>
+      <svg style={{ position: "absolute", top: 0, right: 0, opacity: svgOpacity }} width="260" height="260" viewBox="0 0 260 260" fill="none">
+        <path d="M250 10 L250 180 L180 250 L10 250" stroke={circuitStroke1} strokeWidth="1.5" fill="none" strokeDasharray="400" style={{ animation: "circuitTrace 4s ease-out 1s infinite" }} />
+        <circle cx="250" cy="180" r="4" fill={circuitStroke1} opacity="0.7" />
+        <circle cx="180" cy="250" r="4" fill={circuitOrange} opacity="0.8" />
+      </svg>
+      <div style={{ position: "absolute", top: 80, right: 60, width: 180, height: 180, background: `radial-gradient(circle, rgba(35,85,138,${pulseOpacity1}) 0%, transparent 70%)`, animation: "hexPulse 5s ease-in-out infinite", borderRadius: "50%" }} />
+      <div style={{ position: "absolute", bottom: 100, left: 60, width: 140, height: 140, background: `radial-gradient(circle, rgba(242,147,43,${pulseOpacity2}) 0%, transparent 70%)`, animation: "hexPulse 6s ease-in-out 2s infinite", borderRadius: "50%" }} />
     </div>
   );
 }
 
 function ScanLine() {
   const { isDark } = useTheme();
-  if (!isDark) return null;
-  return <div style={{ position: "absolute", left: 0, right: 0, height: 2, zIndex: 1, pointerEvents: "none", background: "linear-gradient(90deg, transparent 0%, rgba(146,185,214,0.5) 30%, rgba(242,147,43,0.7) 50%, rgba(146,185,214,0.5) 70%, transparent 100%)", animation: "scanLine 8s ease-in-out 2s infinite", top: 0, boxShadow: "0 0 20px rgba(242,147,43,0.4)" }} />;
+  const gradient = isDark
+    ? "linear-gradient(90deg, transparent 0%, rgba(146,185,214,0.5) 30%, rgba(242,147,43,0.7) 50%, rgba(146,185,214,0.5) 70%, transparent 100%)"
+    : "linear-gradient(90deg, transparent 0%, rgba(37,99,168,0.35) 30%, rgba(201,106,10,0.55) 50%, rgba(37,99,168,0.35) 70%, transparent 100%)";
+  const shadow = isDark
+    ? "0 0 20px rgba(242,147,43,0.4)"
+    : "0 0 14px rgba(201,106,10,0.3)";
+  return <div style={{ position: "absolute", left: 0, right: 0, height: 2, zIndex: 1, pointerEvents: "none", background: gradient, animation: "scanLine 8s ease-in-out 2s infinite", top: 0, boxShadow: shadow }} />;
 }
 
 function AnimatedStat({ value, label, index, style = {} }) {
