@@ -412,7 +412,7 @@ function Landing({ goTo }) {
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 12 }}>
           {/* Dark/Light toggle */}
           <ThemeSwitch />
-          <Btn variant="outline" style={{ ...(isMobile ? { padding: "9px 14px", fontSize: 12 } : {}), border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.3)"}`, color: C.text }} onClick={() => goTo("login")}>Log In</Btn>
+          <Btn variant="outline" style={{ ...(isMobile ? { padding: "9px 14px", fontSize: 12 } : {}), border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.5)"}`, color: isDark ? C.text : "#0d3060", fontWeight: 700 }} onClick={() => goTo("login")}>Log In</Btn>
           <Btn variant="primary" style={{ ...(isMobile ? { padding: "9px 14px", fontSize: 12 } : {}), animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("signup")}>Join NEXA</Btn>
         </div>
       </nav>
@@ -429,41 +429,41 @@ function Landing({ goTo }) {
         <h1 style={{ margin: "0 0 10px" }}>
           <AnimatedLetters text="TECH" style={{ fontSize: "clamp(54px,9vw,104px)", fontFamily: "'Conthrax','Montserrat',sans-serif", fontWeight: 700, letterSpacing: isMobile ? 6 : 10, display: "block" }} letterStyle={{ color: C.orange }} animDelay={450} animFrom="bottom" />
         </h1>
-        <div style={{ fontSize: "clamp(10px,1.2vw,13px)", color: isDark ? "rgba(255,255,255,.22)" : "rgba(0,0,0,.3)", letterSpacing: 10, textTransform: "uppercase", marginBottom: 28, fontWeight: 300, fontFamily: "'Montserrat',sans-serif", animation: "fadeInUp 0.8s ease 0.8s both" }}>— School —</div>
+        <div style={{ fontSize: "clamp(10px,1.2vw,13px)", color: isDark ? "rgba(255,255,255,.22)" : "#5a7a95", letterSpacing: 10, textTransform: "uppercase", marginBottom: 28, fontWeight: 600, fontFamily: "'Montserrat',sans-serif", animation: "fadeInUp 0.8s ease 0.8s both" }}>— School —</div>
         <div style={{ display: "flex", alignItems: "center", gap: 16, width: "100%", maxWidth: 520, marginBottom: 28, animation: "fadeInUp 0.7s ease 0.85s both" }}>
           <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${C.sky})`, opacity: 0.4 }} />
           <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.orange, display: "inline-block", flexShrink: 0, animation: "pulseGlow 2s ease-in-out infinite" }} />
           <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${C.sky}, transparent)`, opacity: 0.4 }} />
         </div>
         <div ref={taglineRef} style={{ opacity: 0, marginBottom: 36, maxWidth: 480 }}>
-          <p style={{ fontSize: isMobile ? 15 : 17, color: isDark ? "rgba(255,255,255,.50)" : "rgba(0,0,0,.5)", fontWeight: 300, fontStyle: "italic", lineHeight: 1.8, margin: 0, fontFamily: "'Montserrat',sans-serif" }}>
+          <p style={{ fontSize: isMobile ? 15 : 17, color: isDark ? "rgba(255,255,255,.50)" : "#2a4a62", fontWeight: 400, fontStyle: "italic", lineHeight: 1.8, margin: 0, fontFamily: "'Montserrat',sans-serif" }}>
             We don't teach technology…<br />
-            <span style={{ fontFamily: "'Riffic Free','Montserrat',sans-serif", color: C.sky, fontStyle: "normal", fontSize: isMobile ? 13 : 15 }}>We build creators.</span>
+            <span style={{ fontFamily: "'Riffic Free','Montserrat',sans-serif", color: isDark ? C.sky : "#1a4a7a", fontStyle: "normal", fontSize: isMobile ? 13 : 15, fontWeight: 700 }}>We build creators.</span>
           </p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", marginBottom: 36, animation: "fadeInUp 0.7s ease 1.1s both" }}>
           {[["🤖", "Robotics"], ["🧠", "AI & ML"], ["💻", "Coding"], ["⚡", "Electronics"]].map(([ic, label]) => (
-            <div key={label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 16px", borderRadius: 50, border: `1px solid ${C.border}`, background: isDark ? "rgba(35,85,138,0.15)" : "rgba(26,74,138,0.08)", backdropFilter: "blur(4px)", fontSize: 12, fontWeight: 600, color: C.sky, fontFamily: "'Montserrat',sans-serif" }}>
+            <div key={label} style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 16px", borderRadius: 50, border: `1.5px solid ${isDark ? C.border : "rgba(26,74,138,0.35)"}`, background: isDark ? "rgba(35,85,138,0.15)" : "rgba(26,74,138,0.08)", backdropFilter: "blur(4px)", fontSize: 12, fontWeight: 700, color: isDark ? C.sky : "#0d3060", fontFamily: "'Montserrat',sans-serif" }}>
               <span>{ic}</span><span>{label}</span>
             </div>
           ))}
         </div>
         <div ref={ctaRef} style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 14, width: isMobile ? "100%" : "auto", maxWidth: isMobile ? 320 : "none" }}>
           <Btn variant="primary" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, background: `linear-gradient(135deg, ${C.orange}, #e07b1a)`, boxShadow: `0 4px 24px rgba(242,147,43,0.4)`, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("signup")}>Create Account</Btn>
-          <Btn variant="outline" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, border: `1.5px solid ${isDark ? "rgba(146,185,214,0.3)" : "rgba(26,74,138,0.3)"}`, backdropFilter: "blur(4px)", color: C.text, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("login")}>Sign In</Btn>
+          <Btn variant="outline" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, border: `2px solid ${isDark ? "rgba(146,185,214,0.3)" : "rgba(26,74,138,0.5)"}`, backdropFilter: "blur(4px)", color: isDark ? C.text : "#0d3060", fontWeight: 700, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("login")}>Sign In</Btn>
         </div>
         <div style={{ display: "flex", gap: 0, marginTop: 64, flexWrap: "wrap", justifyContent: "center", borderTop: `1px solid ${C.border}`, paddingTop: 40, width: "100%", maxWidth: 600 }}>
           {[["3", "Year Program"], ["432", "Total Hours"], ["4", "Systems"], ["6–17", "Age Range"]].map(([n, l], i) => (
             <AnimatedStat key={i} index={i}
               style={{ padding: isMobile ? "0 14px" : "0 34px", borderRight: i < 3 ? `1px solid ${C.border}` : "none" }}
               value={<div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: C.orange, letterSpacing: 2, fontFamily: "'Conthrax','Montserrat',sans-serif" }}>{n}</div>}
-              label={<div style={{ fontSize: 9, color: isDark ? "rgba(255,255,255,.28)" : "rgba(0,0,0,.35)", letterSpacing: 3, textTransform: "uppercase", marginTop: 5, fontFamily: "'Montserrat',sans-serif" }}>{l}</div>}
+              label={<div style={{ fontSize: 9, color: isDark ? "rgba(255,255,255,.28)" : "#3a5870", letterSpacing: 3, textTransform: "uppercase", marginTop: 5, fontFamily: "'Montserrat',sans-serif", fontWeight: 700 }}>{l}</div>}
             />
           ))}
         </div>
       </div>
       <div style={{ position: "relative", zIndex: 5, textAlign: "center", padding: "12px 20px", borderTop: `1px solid ${C.border}`, background: isDark ? "rgba(2,12,24,0.7)" : "rgba(240,244,248,0.85)", backdropFilter: "blur(8px)", transition: "background .3s" }}>
-        <span style={{ fontSize: 10, color: C.textMuted, letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif" }}>NEXA Tech School · Cairo, Egypt · AI · Robotics · Coding · Est. 2025</span>
+        <span style={{ fontSize: 10, color: isDark ? C.textMuted : "#3a5870", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif", fontWeight: 600 }}>NEXA Tech School · Cairo, Egypt · AI · Robotics · Coding · Est. 2025</span>
       </div>
     </div>
   );
