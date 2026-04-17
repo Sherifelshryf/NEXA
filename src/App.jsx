@@ -465,11 +465,11 @@ function Landing({ goTo }) {
       {/* ── NAV ── */}
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "16px 20px" : "20px 60px", position: "relative", zIndex: 10, borderBottom: `1px solid ${C.border}`, backdropFilter: "blur(8px)", background: isDark ? "rgba(2,12,24,0.6)" : "rgba(240,244,248,0.85)", transition: "background .3s" }}>
         <NexaLogo size={isMobile ? 40 : 48} isMobile={isMobile} />
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 12 }}>
-          {/* Dark/Light toggle */}
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 7 : 10 }}>
           <ThemeSwitch />
-          <Btn variant="outline" style={{ ...(isMobile ? { padding: "9px 14px", fontSize: 12 } : {}), border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.5)"}`, color: isDark ? C.text : "#0d3060", fontWeight: 700 }} onClick={() => goTo("login")}>Log In</Btn>
-          <Btn variant="primary" style={{ ...(isMobile ? { padding: "9px 14px", fontSize: 12 } : {}), animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("signup")}>Join NEXA</Btn>
+          {!isMobile && <Btn variant="ghost" style={{ border: `1.5px solid ${C.border}`, color: C.textMid, fontSize: 12, padding: "9px 16px" }} onClick={() => goTo("subscribe")}>Pricing</Btn>}
+          <Btn variant="outline" style={{ ...(isMobile ? { padding: "9px 12px", fontSize: 11 } : {}), border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.5)"}`, color: isDark ? C.text : "#0d3060", fontWeight: 700 }} onClick={() => goTo("login")}>Log In</Btn>
+          <Btn variant="primary" style={{ ...(isMobile ? { padding: "9px 12px", fontSize: 11 } : {}), animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("signup")}>Join NEXA</Btn>
         </div>
       </nav>
 
@@ -508,6 +508,14 @@ function Landing({ goTo }) {
           <Btn variant="primary" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, background: `linear-gradient(135deg, ${C.orange}, #e07b1a)`, boxShadow: `0 4px 24px rgba(242,147,43,0.4)`, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("signup")}>Create Account</Btn>
           <Btn variant="outline" style={{ opacity: 0, padding: "15px 40px", fontSize: 14, borderRadius: 50, border: `2px solid ${isDark ? "rgba(146,185,214,0.3)" : "rgba(26,74,138,0.5)"}`, backdropFilter: "blur(4px)", color: isDark ? C.text : "#0d3060", fontWeight: 700, ...(isMobile ? { width: "100%" } : {}) }} onClick={() => goTo("login")}>Sign In</Btn>
         </div>
+        {/* What is NEXA big button */}
+        <div style={{ marginTop: 22, width: isMobile ? "100%" : "auto", maxWidth: isMobile ? 320 : "none" }}>
+          <button onClick={() => goTo("about")} className="neon-btn" style={{ animation: "fadeInUp 0.7s ease 1.7s both", width: isMobile ? "100%" : "auto", padding: "16px 52px", fontSize: 15, fontWeight: 800, fontFamily: "'Montserrat',sans-serif", borderRadius: 50, border: `2px solid ${isDark ? "rgba(146,185,214,0.5)" : "rgba(26,74,138,0.6)"}`, background: isDark ? "rgba(35,85,138,0.18)" : "rgba(26,74,138,0.09)", color: isDark ? C.sky : "#0d3060", backdropFilter: "blur(6px)", cursor: "pointer", position: "relative", overflow: "hidden", letterSpacing: 1, transition: "all .25s", boxShadow: isDark ? "0 0 20px rgba(35,85,138,0.25), inset 0 0 20px rgba(35,85,138,0.05)" : "0 0 20px rgba(26,74,138,0.15)" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = C.orange; e.currentTarget.style.color = C.orange; e.currentTarget.style.boxShadow = "0 0 28px rgba(242,147,43,0.35)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = isDark ? "rgba(146,185,214,0.5)" : "rgba(26,74,138,0.6)"; e.currentTarget.style.color = isDark ? C.sky : "#0d3060"; e.currentTarget.style.boxShadow = isDark ? "0 0 20px rgba(35,85,138,0.25)" : "0 0 20px rgba(26,74,138,0.15)"; }}>
+            <span style={{ position: "relative", zIndex: 1 }}>✦ What is NEXA? ✦</span>
+          </button>
+        </div>
         <div style={{ display: "flex", gap: 0, marginTop: 64, flexWrap: "wrap", justifyContent: "center", borderTop: `1px solid ${C.border}`, paddingTop: 40, width: "100%", maxWidth: 600 }}>
           {[["3", "Year Program"], ["432", "Total Hours"], ["4", "Systems"], ["6–17", "Age Range"]].map(([n, l], i) => (
             <AnimatedStat key={i} index={i}
@@ -518,8 +526,334 @@ function Landing({ goTo }) {
           ))}
         </div>
       </div>
+      <div style={{ position: "relative", zIndex: 5, padding: isMobile ? "42px 20px" : "60px 40px", borderTop: `1px solid ${C.border}`, background: isDark ? "rgba(35,85,138,.05)" : "rgba(26,74,138,.04)", textAlign: "center", backdropFilter: "blur(4px)" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>Annual Pricing</div>
+          <h2 style={{ fontSize: isMobile ? "clamp(22px,6vw,32px)" : "clamp(28px,3vw,42px)", fontWeight: 900, color: C.text, marginBottom: 14, fontFamily: "'Conthrax','Montserrat',sans-serif" }}>Invest in <span style={{ color: C.orange }}>Your Child's Future</span></h2>
+          <p style={{ fontSize: isMobile ? 13 : 15, color: C.textMid, marginBottom: 28, lineHeight: 1.8 }}>Flexible plans for all age groups · 3 Levels · All Subjects · Full Experience</p>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(3,1fr)" : "repeat(3,1fr)", gap: 12, maxWidth: 580, margin: "0 auto 30px" }}>
+            {[{age:"Ages 6–9",from:"from 4,200 EGP/mo"},{age:"Ages 10–13",from:"from 5,000 EGP/mo"},{age:"Ages 14–17",from:"from 5,600 EGP/mo"}].map((p,i) => (
+              <div key={i} style={{ background: isDark ? "rgba(35,85,138,.15)" : "rgba(26,74,138,.07)", borderRadius: 14, border: `1px solid ${C.border}`, padding: isMobile ? "14px 10px" : "18px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: isMobile ? 11 : 13, fontWeight: 800, color: C.orange, marginBottom: 5 }}>{p.age}</div>
+                <div style={{ fontSize: isMobile ? 9 : 11, color: C.textMuted }}>{p.from}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <Btn variant="primary" style={{ padding: "14px 40px", fontSize: 13, borderRadius: 50, animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("subscribe")}>View Pricing & Enroll →</Btn>
+            <Btn variant="outline" style={{ padding: "14px 28px", fontSize: 13, borderRadius: 50, border: `2px solid ${isDark ? "rgba(146,185,214,0.3)" : "rgba(26,74,138,0.5)"}`, color: isDark ? C.text : "#0d3060" }} onClick={() => goTo("about")}>What is NEXA?</Btn>
+          </div>
+        </div>
+      </div>
       <div style={{ position: "relative", zIndex: 5, textAlign: "center", padding: "12px 20px", borderTop: `1px solid ${C.border}`, background: isDark ? "rgba(2,12,24,0.7)" : "rgba(240,244,248,0.85)", backdropFilter: "blur(8px)", transition: "background .3s" }}>
         <span style={{ fontSize: 10, color: isDark ? C.textMuted : "#3a5870", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif", fontWeight: 600 }}>NEXA Tech School · Cairo, Egypt · AI · Robotics · Coding · Est. 2025</span>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   WHAT IS NEXA PAGE
+══════════════════════════════════════════ */
+const NEXA_SECTIONS = [
+  { num:"01", icon:"💡", title:"The Big Idea", type:"quote", content:"The future will not belong to those who use technology…", highlight:"but to those who build it." },
+  { num:"02", icon:"📈", title:"The Opportunity", type:"bullets", bullets:["85% of future jobs will require tech skills","Kids today are consumers, not creators","Parents are actively searching for future-proof education","Massive gap in structured tech education in MENA"] },
+  { num:"03", icon:"🔍", title:"The Problem (Deep Level)", type:"split", label:"Current Reality:", bullets:["Fragmented courses","No long-term roadmap","No real outcomes","No integration between skills"], footer:"Kids learn tools… not thinking" },
+  { num:"04", icon:"🔄", title:"The Shift", type:"compare", left:{ label:"Old Model", items:["Courses → Information → Forget"] }, right:{ label:"NEXA Model", items:["System → Practice → Creation → Mastery"] } },
+  { num:"05", icon:"🏫", title:"The Solution", type:"highlight", content:"A 3-Year Structured Technology School", bullets:["Built like an international school","Designed for real-world skills","Focused on creation, not consumption"] },
+  { num:"06", icon:"🏗️", title:"Product Architecture", type:"systems", intro:"NEXA = 4 Systems in 1 — All connected through projects", systems:[{icon:"💻",name:"Programming System"},{icon:"🤖",name:"AI System"},{icon:"⚙️",name:"Robotics System"},{icon:"📱",name:"Marketing System"}] },
+  { num:"07", icon:"⚡", title:"The Learning Engine", type:"flow", intro:"Project-Based Integrated Learning", flow:["Learn","Apply","Integrate","Present"] },
+  { num:"08", icon:"📐", title:"Program Structure", type:"stats", stats:[{value:"3 Years",label:"Duration"},{value:"9 Levels",label:"Total Levels"},{value:"2 Months",label:"Per Level"},{value:"16 Hours",label:"Per Subject / Level"}] },
+  { num:"09", icon:"🎯", title:"Age Strategy", type:"ages", ages:[{range:"6–9",desc:"Exploration & Thinking",color:"#f2932b"},{range:"10–13",desc:"Building & Logic",color:"#23558a"},{range:"14–17",desc:"Creation & Real Skills",color:"#92b9d6"}] },
+  { num:"10", icon:"⏱️", title:"Hours & Commitment", type:"hours", perLevel:"16 hours per subject · 3 subjects = 48 hours / level", perYear:"48 × 3 Levels = 144 hours / year", total:"144 × 3 Years = 432 hours total" },
+  { num:"11", icon:"🚀", title:"Student Journey", type:"journey", years:[{year:"Year 1",theme:"Exploration"},{year:"Year 2",theme:"Building"},{year:"Year 3",theme:"Creation"}] },
+  { num:"12", icon:"🏆", title:"Outcomes", type:"outcomes", intro:"Students will:", outcomes:[{num:"01",text:"Think logically"},{num:"02",text:"Build real projects"},{num:"03",text:"Understand AI"},{num:"04",text:"Be ready for work"}] },
+];
+
+function NexaSectionCard({ sec, isMobile, isDark, idx }) {
+  const accentColor = idx % 3 === 0 ? C.orange : idx % 3 === 1 ? C.navyMid : C.sky;
+  return (
+    <div className="nexa-section-card" data-idx={idx} style={{ background: C.bgCard, borderRadius: 18, border: `1px solid ${C.border}`, padding: isMobile ? "22px 18px" : "32px 36px", marginBottom: 22, opacity: 0, transform: "translateY(30px)", transition: "opacity 0.6s ease, transform 0.6s ease", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${accentColor},transparent)`, borderRadius: "18px 18px 0 0" }} />
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 20 }}>
+        <div style={{ width: 46, height: 46, borderRadius: 12, background: `${accentColor}1a`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>{sec.icon}</div>
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 700, color: accentColor, letterSpacing: 3, textTransform: "uppercase", marginBottom: 4 }}>Section {sec.num}</div>
+          <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 800, color: C.text }}>{sec.title}</div>
+        </div>
+      </div>
+      {sec.type === "quote" && <div style={{ padding: "16px 20px", borderLeft: `3px solid ${C.orange}`, background: isDark ? "rgba(242,147,43,.06)" : "rgba(242,147,43,.08)", borderRadius: "0 12px 12px 0" }}><p style={{ fontSize: isMobile ? 15 : 18, color: C.textMid, fontStyle: "italic", margin: "0 0 8px", lineHeight: 1.7 }}>{sec.content}</p><p style={{ fontSize: isMobile ? 16 : 20, fontWeight: 800, color: C.text, margin: 0 }}>{sec.highlight}</p></div>}
+      {sec.type === "bullets" && <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>{sec.bullets.map((b, i) => (<li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "9px 0", borderBottom: i < sec.bullets.length - 1 ? `1px solid ${C.border}` : "none" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: accentColor, flexShrink: 0, marginTop: 5 }} /><span style={{ fontSize: isMobile ? 13 : 14, color: C.text, lineHeight: 1.6 }}>{b}</span></li>))}</ul>}
+      {sec.type === "split" && <div>{sec.label && <div style={{ fontSize: 11, fontWeight: 700, color: accentColor, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>{sec.label}</div>}<ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px" }}>{sec.bullets.map((b, i) => (<li key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i < sec.bullets.length - 1 ? `1px solid ${C.border}` : "none" }}><span style={{ color: "#ef4444", fontSize: 14, fontWeight: 700 }}>✕</span><span style={{ fontSize: isMobile ? 13 : 14, color: C.text }}>{b}</span></li>))}</ul>{sec.footer && <div style={{ padding: "12px 16px", background: isDark ? "rgba(239,68,68,.08)" : "rgba(239,68,68,.06)", borderRadius: 10, border: "1px solid rgba(239,68,68,.2)", fontSize: 13, fontWeight: 700, color: isDark ? "#f87171" : "#dc2626", fontStyle: "italic" }}>{sec.footer}</div>}</div>}
+      {sec.type === "compare" && <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14 }}><div style={{ padding: "16px 18px", borderRadius: 12, background: isDark ? "rgba(239,68,68,.06)" : "rgba(239,68,68,.05)", border: "1px solid rgba(239,68,68,.2)" }}><div style={{ fontSize: 11, fontWeight: 700, color: "#f87171", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{sec.left.label}</div>{sec.left.items.map((item, i) => <div key={i} style={{ fontSize: isMobile ? 12 : 13, color: C.text, lineHeight: 1.7, fontStyle: "italic" }}>{item}</div>)}</div><div style={{ padding: "16px 18px", borderRadius: 12, background: `${C.orange}0d`, border: `1px solid ${C.orange}33` }}><div style={{ fontSize: 11, fontWeight: 700, color: C.orange, textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{sec.right.label}</div>{sec.right.items.map((item, i) => <div key={i} style={{ fontSize: isMobile ? 12 : 13, color: C.text, lineHeight: 1.7, fontWeight: 700 }}>{item}</div>)}</div></div>}
+      {sec.type === "highlight" && <div><div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 800, color: C.orange, marginBottom: 18, padding: "14px 20px", background: `${C.orange}10`, borderRadius: 10, textAlign: "center" }}>{sec.content}</div><ul style={{ listStyle: "none", padding: 0, margin: 0 }}>{sec.bullets.map((b, i) => (<li key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i < sec.bullets.length - 1 ? `1px solid ${C.border}` : "none" }}><span style={{ color: "#4ade80", fontSize: 14 }}>✓</span><span style={{ fontSize: isMobile ? 13 : 14, color: C.text }}>{b}</span></li>))}</ul></div>}
+      {sec.type === "systems" && <div><p style={{ fontSize: isMobile ? 13 : 14, color: C.textMid, marginBottom: 20, fontWeight: 600 }}>{sec.intro}</p><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12 }}>{sec.systems.map((sys, i) => (<div key={i} style={{ padding: "18px 14px", borderRadius: 12, border: `1px solid ${C.border}`, background: C.bgElevated, textAlign: "center" }}><div style={{ fontSize: 28, marginBottom: 8 }}>{sys.icon}</div><div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{sys.name}</div></div>))}</div></div>}
+      {sec.type === "flow" && <div><p style={{ fontSize: isMobile ? 13 : 14, color: C.textMid, marginBottom: 20, fontWeight: 600 }}>{sec.intro}</p><div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>{sec.flow.map((step, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ padding: "10px 18px", borderRadius: 50, background: [C.orange, C.navyMid, C.sky, "#6366f1"][i], color: "#fff", fontSize: 12, fontWeight: 700, boxShadow: `0 2px 12px rgba(0,0,0,.2)` }}>{step}</div>{i < sec.flow.length - 1 && <span style={{ color: C.textMuted, fontSize: 16, fontWeight: 700 }}>→</span>}</div>))}</div></div>}
+      {sec.type === "stats" && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 14 }}>{sec.stats.map((stat, i) => (<div key={i} style={{ padding: "18px 14px", borderRadius: 12, border: `1px solid ${C.border}`, background: C.bgElevated, textAlign: "center" }}><div style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, color: accentColor, marginBottom: 4 }}>{stat.value}</div><div style={{ fontSize: 11, color: C.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>{stat.label}</div></div>))}</div>}
+      {sec.type === "ages" && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14 }}>{sec.ages.map((age, i) => (<div key={i} style={{ padding: "20px 16px", borderRadius: 14, border: `2px solid ${age.color}40`, background: `${age.color}0d`, textAlign: "center" }}><div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 900, color: age.color, marginBottom: 6 }}>{age.range}</div><div style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>{age.desc}</div></div>))}</div>}
+      {sec.type === "hours" && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{[{text:sec.perLevel,c:C.orange},{text:sec.perYear,c:C.navyMid},{text:sec.total,c:C.sky}].map((item, i) => (<div key={i} style={{ padding: "12px 16px", borderRadius: 10, background: C.bgElevated, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 12 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: item.c, flexShrink: 0 }} /><span style={{ fontSize: isMobile ? 12 : 14, color: C.text, fontWeight: i === 2 ? 700 : 400 }}>{item.text}</span></div>))}</div>}
+      {sec.type === "journey" && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14 }}>{sec.years.map((y, i) => (<div key={i} style={{ padding: "20px 16px", borderRadius: 14, background: `linear-gradient(135deg,${[C.navy,C.navyMid,C.orange][i]}22,${[C.navyMid,C.navy,C.orangeLight][i]}11)`, border: `1px solid ${[C.navy,C.navyMid,C.orange][i]}33`, textAlign: "center" }}><div style={{ fontSize: 11, fontWeight: 700, color: [C.sky,C.orangeLight,C.orange][i], textTransform: "uppercase", letterSpacing: 2, marginBottom: 6 }}>{y.year}</div><div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: C.text }}>{y.theme}</div></div>))}</div>}
+      {sec.type === "outcomes" && <div><p style={{ fontSize: isMobile ? 13 : 14, color: C.textMid, marginBottom: 18, fontWeight: 600 }}>{sec.intro}</p><div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 12 }}>{sec.outcomes.map((o, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 12, background: C.bgElevated, border: `1px solid ${C.border}` }}><div style={{ width: 36, height: 36, borderRadius: 10, background: accentColor + "1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: accentColor, flexShrink: 0 }}>{o.num}</div><div style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: C.text }}>{o.text}</div></div>))}</div></div>}
+    </div>
+  );
+}
+
+function WhatIsNexaPage({ goTo }) {
+  const isMobile = useIsMobile();
+  const { isDark } = useTheme();
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const cards = containerRef.current.querySelectorAll(".nexa-section-card");
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.style.opacity = "1"; e.target.style.transform = "translateY(0)"; obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.08 });
+    cards.forEach(c => obs.observe(c));
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Montserrat',sans-serif", transition: "background .3s" }}>
+      <MatrixRain opacity={0.10} />
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "14px 18px" : "18px 60px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)", background: isDark ? "rgba(2,12,24,0.88)" : "rgba(240,244,248,0.93)", borderBottom: `1px solid ${C.border}`, transition: "background .3s" }}>
+        <NexaLogo size={isMobile ? 36 : 42} isMobile={isMobile} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <ThemeSwitch />
+          <Btn variant="outline" style={{ padding: isMobile ? "8px 12px" : "10px 20px", fontSize: isMobile ? 11 : 12, border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.5)"}`, color: isDark ? C.text : "#0d3060" }} onClick={() => goTo("landing")}>← Back</Btn>
+          <Btn variant="primary" style={{ padding: isMobile ? "8px 12px" : "10px 20px", fontSize: isMobile ? 11 : 12, animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("subscribe")}>Enroll Now →</Btn>
+        </div>
+      </nav>
+
+      <div style={{ textAlign: "center", padding: isMobile ? "50px 20px 30px" : "80px 40px 50px", position: "relative", zIndex: 2 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 20, padding: "6px 20px", borderRadius: 50, border: `1px solid ${C.border}`, background: isDark ? "rgba(35,85,138,.18)" : "rgba(26,74,138,.08)" }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: 3, textTransform: "uppercase" }}>NEXA Tech School · Cairo, Egypt</span>
+        </div>
+        <h1 style={{ fontSize: isMobile ? "clamp(32px,8vw,50px)" : "clamp(44px,5vw,72px)", fontWeight: 900, color: C.text, lineHeight: 1.1, margin: "0 0 20px", fontFamily: "'Conthrax','Montserrat',sans-serif" }}>
+          What is <span style={{ color: C.orange }}>NEXA</span>?
+        </h1>
+        <p style={{ fontSize: isMobile ? 14 : 17, color: C.textMid, maxWidth: 580, margin: "0 auto 28px", lineHeight: 1.9 }}>
+          The future will not belong to those who use technology…<br />
+          <strong style={{ color: isDark ? C.sky : "#1a4a7a" }}>but to those who build it.</strong>
+        </p>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+          {["3-Year Program","432 Total Hours","4 Systems","Ages 6–17","Cairo, Egypt"].map(t => (
+            <span key={t} style={{ padding: "6px 16px", borderRadius: 50, border: `1px solid ${C.border}`, fontSize: 11, fontWeight: 700, color: C.textMid, background: isDark ? "rgba(35,85,138,.1)" : "rgba(26,74,138,.06)" }}>{t}</span>
+          ))}
+        </div>
+      </div>
+
+      <div ref={containerRef} style={{ maxWidth: 900, margin: "0 auto", padding: isMobile ? "0 14px 80px" : "0 40px 100px", position: "relative", zIndex: 2 }}>
+        {NEXA_SECTIONS.map((sec, idx) => <NexaSectionCard key={sec.num} sec={sec} isMobile={isMobile} isDark={isDark} idx={idx} />)}
+      </div>
+
+      <div style={{ textAlign: "center", padding: isMobile ? "50px 20px 70px" : "70px 40px 90px", background: isDark ? "rgba(242,147,43,.04)" : "rgba(242,147,43,.05)", borderTop: `1px solid ${C.border}`, position: "relative", zIndex: 2 }}>
+        <div style={{ fontSize: isMobile ? 24 : 36, fontWeight: 900, color: C.text, marginBottom: 16 }}>Ready to <span style={{ color: C.orange }}>Build</span>?</div>
+        <p style={{ color: C.textMid, fontSize: isMobile ? 13 : 15, maxWidth: 440, margin: "0 auto 30px", lineHeight: 1.8 }}>Join NEXA Tech School and start your child's journey from consumer to creator.</p>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+          <Btn variant="primary" style={{ padding: "15px 44px", fontSize: 14, borderRadius: 50, boxShadow: "0 4px 24px rgba(242,147,43,0.35)", animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={() => goTo("subscribe")}>Enroll Now →</Btn>
+          <Btn variant="outline" style={{ padding: "15px 32px", fontSize: 14, borderRadius: 50, border: `2px solid ${isDark ? "rgba(146,185,214,0.35)" : "rgba(26,74,138,0.4)"}`, color: isDark ? C.text : "#0d3060" }} onClick={() => goTo("landing")}>Back to Home</Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   SUBSCRIPTION / PRICING PAGE
+══════════════════════════════════════════ */
+const PRICING_PLANS = {
+  "6-9":  { ageRange: "Ages 6 – 9",   tiers: [{ name:"3-Year Full Program", price:"75,000 EGP", period:"3 Years",   tag:"Best Value" },{ name:"1-Year Program", price:"25,000 EGP", period:"1 Year",    tag:"Popular" },{ name:"Monthly Plan", price:"4,200 EGP/mo", period:"Over 6 months", tag:"" }] },
+  "10-13":{ ageRange: "Ages 10 – 13", tiers: [{ name:"3-Year Full Program", price:"90,000 EGP", period:"3 Years",   tag:"Best Value" },{ name:"1-Year Program", price:"30,000 EGP", period:"1 Year",    tag:"Popular" },{ name:"Monthly Plan", price:"5,000 EGP/mo", period:"Over 6 months", tag:"" }] },
+  "14-17":{ ageRange: "Ages 14 – 17", tiers: [{ name:"3-Year Full Program", price:"105,000 EGP",period:"3 Years",   tag:"Best Value" },{ name:"1-Year Program", price:"35,000 EGP", period:"1 Year",    tag:"Popular" },{ name:"Monthly Plan", price:"5,600 EGP/mo", period:"Over 6 months", tag:"" }] },
+};
+
+function SubscriptionPage({ goTo }) {
+  const isMobile = useIsMobile();
+  const { isDark } = useTheme();
+  const [selectedAge, setSelectedAge] = useState("6-9");
+  const [form, setForm] = useState({ studentName:"", parentName:"", studentPhone:"", parentPhone:"", school:"", age:"", plan:"" });
+  const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [err, setErr] = useState("");
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: typeof e === "string" ? e : e.target.value }));
+
+  function selectPlan(ageKey, tierIdx) {
+    const plan = PRICING_PLANS[ageKey];
+    const tier = plan.tiers[tierIdx];
+    setSelectedAge(ageKey);
+    setForm(p => ({ ...p, plan: `${plan.ageRange} — ${tier.name} (${tier.price})` }));
+    setShowForm(true);
+    setTimeout(() => document.getElementById("enrollment-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+  }
+
+  async function handleSubmit() {
+    setErr("");
+    if (!form.studentName || !form.parentName || !form.parentPhone || !form.school || !form.age || !form.plan) { setErr("Please fill all required fields."); return; }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("subscription_requests").insert({ student_name: form.studentName, parent_name: form.parentName, student_phone: form.studentPhone || null, parent_phone: form.parentPhone, school: form.school, age: parseInt(form.age) || null, plan: form.plan, status: "pending", created_at: new Date().toISOString() });
+      if (error && !error.message?.includes("does not exist")) {
+        console.error("Enrollment insert error:", error);
+      }
+    } catch (e) { console.error("Enrollment submit error:", e); }
+    setSubmitted(true);
+    setSubmitting(false);
+    toast("Enrollment request submitted! We'll contact you soon 🚀");
+  }
+
+  const includes = ["3 Levels included","All 3 subjects","Projects + full experience","Flexible payment plans available"];
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Montserrat',sans-serif", transition: "background .3s" }}>
+      <MatrixRain opacity={0.07} />
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "14px 18px" : "18px 60px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)", background: isDark ? "rgba(2,12,24,0.88)" : "rgba(240,244,248,0.93)", borderBottom: `1px solid ${C.border}`, transition: "background .3s" }}>
+        <NexaLogo size={isMobile ? 36 : 42} isMobile={isMobile} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <ThemeSwitch />
+          <Btn variant="outline" style={{ padding: isMobile ? "8px 12px" : "10px 20px", fontSize: isMobile ? 11 : 12, border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.5)"}`, color: isDark ? C.text : "#0d3060" }} onClick={() => goTo("landing")}>← Home</Btn>
+          <Btn variant="ghost" style={{ padding: isMobile ? "8px 12px" : "10px 20px", fontSize: isMobile ? 11 : 12, border: `1.5px solid ${C.border}`, color: C.textMid }} onClick={() => goTo("about")}>What is NEXA?</Btn>
+        </div>
+      </nav>
+
+      <div style={{ textAlign: "center", padding: isMobile ? "50px 20px 30px" : "70px 40px 40px", position: "relative", zIndex: 2 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 18, padding: "6px 20px", borderRadius: 50, border: `1px solid ${C.border}`, background: isDark ? "rgba(35,85,138,.18)" : "rgba(26,74,138,.08)" }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: C.orange, letterSpacing: 3, textTransform: "uppercase" }}>Annual Pricing</span>
+        </div>
+        <h1 style={{ fontSize: isMobile ? "clamp(26px,7vw,42px)" : "clamp(36px,4vw,56px)", fontWeight: 900, color: C.text, margin: "0 0 14px", fontFamily: "'Conthrax','Montserrat',sans-serif" }}>
+          Pricing & <span style={{ color: C.orange }}>Enrollment</span>
+        </h1>
+        <p style={{ fontSize: isMobile ? 13 : 15, color: C.textMid, maxWidth: 520, margin: "0 auto 16px", lineHeight: 1.9 }}>
+          Includes: 3 Levels · All 3 Subjects · Projects + Full Experience
+          <br /><span style={{ color: C.orange, fontWeight: 700 }}>Flexible payment plans available</span>
+        </p>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginTop: 10 }}>
+          {includes.map(t => <span key={t} style={{ padding: "5px 14px", borderRadius: 50, border: `1px solid ${C.border}`, fontSize: 11, fontWeight: 600, color: C.textMid, background: isDark ? "rgba(35,85,138,.1)" : "rgba(26,74,138,.06)" }}>✓ {t}</span>)}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: isMobile ? "0 14px 60px" : "0 40px 80px", position: "relative", zIndex: 2 }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 32, flexWrap: "wrap" }}>
+          {Object.entries(PRICING_PLANS).map(([key, plan]) => (
+            <button key={key} onClick={() => setSelectedAge(key)} className="neon-btn" style={{ padding: "10px 26px", borderRadius: 50, border: `2px solid ${selectedAge === key ? C.orange : C.border}`, background: selectedAge === key ? C.orange : "transparent", color: selectedAge === key ? "#fff" : C.textMid, fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all .2s" }}>{plan.ageRange}</button>
+          ))}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 18, marginBottom: 32 }}>
+          {PRICING_PLANS[selectedAge].tiers.map((tier, i) => (
+            <div key={i} onClick={() => selectPlan(selectedAge, i)} style={{ background: i === 0 ? `linear-gradient(135deg,${C.navyMid},${C.navy})` : C.bgCard, borderRadius: 20, border: `2px solid ${i === 0 ? C.orange : C.border}`, padding: isMobile ? "26px 20px" : "32px 26px", position: "relative", overflow: "hidden", cursor: "pointer", transition: "transform .25s, box-shadow .25s", boxShadow: i === 0 ? `0 8px 32px rgba(242,147,43,.18)` : "0 2px 14px rgba(0,0,0,.08)" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = i === 0 ? "0 16px 44px rgba(242,147,43,.3)" : "0 8px 28px rgba(0,0,0,.15)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = i === 0 ? "0 8px 32px rgba(242,147,43,.18)" : "0 2px 14px rgba(0,0,0,.08)"; }}>
+              {i === 0 && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${C.orange},${C.orangeLight})` }} />}
+              {tier.tag && <div style={{ position: "absolute", top: 16, right: 16, padding: "3px 10px", borderRadius: 20, background: "rgba(242,147,43,.22)", fontSize: 9, fontWeight: 700, color: C.orange, textTransform: "uppercase", letterSpacing: 1 }}>{tier.tag}</div>}
+              <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: i === 0 ? "#fff" : C.text, marginBottom: 4, fontFamily: "'Conthrax','Montserrat',sans-serif", lineHeight: 1 }}>{tier.price}</div>
+              <div style={{ fontSize: 12, color: i === 0 ? "rgba(255,255,255,.6)" : C.textMuted, marginBottom: 18, fontWeight: 600 }}>{tier.period}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: i === 0 ? "#fff" : C.text, marginBottom: 14 }}>{tier.name}</div>
+              <div style={{ fontSize: 11, color: i === 0 ? "rgba(255,255,255,.5)" : C.textMuted, marginBottom: 22, lineHeight: 1.7 }}>• 3 Levels included<br />• All 3 subjects<br />• Project-based learning</div>
+              <div style={{ padding: "11px 0", borderRadius: 10, background: i === 0 ? "rgba(255,255,255,.12)" : `${C.orange}14`, border: `1.5px solid ${i === 0 ? "rgba(255,255,255,.2)" : C.border}`, textAlign: "center", fontSize: 12, fontWeight: 700, color: i === 0 ? "#fff" : C.orange }}>Select Plan →</div>
+            </div>
+          ))}
+        </div>
+
+        {showForm && !submitted && (
+          <div id="enrollment-form" style={{ background: C.bgCard, borderRadius: 20, border: `1px solid ${C.border}`, padding: isMobile ? "24px 18px" : "40px 40px", boxShadow: "0 4px 32px rgba(0,0,0,.1)", animation: "fadeInUp .4s ease" }}>
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 6 }}>📋 Enrollment Form</div>
+              <div style={{ fontSize: 12, color: C.textMuted }}>Selected plan: <span style={{ color: C.orange, fontWeight: 700 }}>{form.plan}</span></div>
+            </div>
+            {err && <div style={{ background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#f87171", marginBottom: 14 }}>{err}</div>}
+            <FormRow><FInput label="Student Name *" placeholder="Full name of the student" value={form.studentName} onChange={set("studentName")} /><FInput label="Parent / Guardian Name *" placeholder="Full name" value={form.parentName} onChange={set("parentName")} /></FormRow>
+            <FormRow><FInput label="Parent Phone *" placeholder="01XXXXXXXXX" value={form.parentPhone} onChange={set("parentPhone")} /><FInput label="Student Phone" optional placeholder="01XXXXXXXXX" value={form.studentPhone} onChange={set("studentPhone")} /></FormRow>
+            <FormRow><FInput label="School Name *" placeholder="Current school" value={form.school} onChange={set("school")} /><FInput label="Student Age *" type="number" placeholder="6–17" value={form.age} onChange={set("age")} /></FormRow>
+            <FInput label="Selected Plan" value={form.plan} onChange={() => {}} />
+            <div style={{ display: "flex", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
+              <Btn variant="primary" block style={{ borderRadius: 10, animation: "glowPulse 2.5s ease-in-out infinite" }} onClick={handleSubmit} loading={submitting}>Submit Enrollment Request 🚀</Btn>
+              <Btn variant="navy" style={{ borderRadius: 10, padding: "14px 22px", flexShrink: 0 }} onClick={() => goTo("pay")}>Pay with Card 💳</Btn>
+            </div>
+            <div style={{ fontSize: 10, color: C.textMuted, marginTop: 12, textAlign: "center" }}>🔒 Your information is kept private and secure</div>
+          </div>
+        )}
+
+        {submitted && (
+          <div style={{ background: isDark ? "rgba(34,197,94,.07)" : "rgba(34,197,94,.06)", border: "1px solid rgba(34,197,94,.25)", borderRadius: 20, padding: isMobile ? "30px 20px" : "50px 40px", textAlign: "center", animation: "fadeInUp .4s ease" }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
+            <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 800, color: C.text, marginBottom: 10 }}>Enrollment Request Submitted!</div>
+            <div style={{ fontSize: isMobile ? 13 : 14, color: C.textMuted, maxWidth: 420, margin: "0 auto 28px", lineHeight: 1.8 }}>Our team will reach out within 24 hours to confirm your enrollment and discuss payment options.</div>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Btn variant="primary" style={{ padding: "13px 32px" }} onClick={() => goTo("landing")}>Back to Home</Btn>
+              <Btn variant="outline" style={{ padding: "13px 24px", border: `1.5px solid ${C.border}`, color: C.textMid }} onClick={() => { setSubmitted(false); setShowForm(false); }}>Make Another Request</Btn>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   PAY WITH CARD PAGE
+══════════════════════════════════════════ */
+function PayWithCardPage({ goTo }) {
+  const isMobile = useIsMobile();
+  const { isDark } = useTheme();
+  const [form, setForm] = useState({ name:"", card:"", expiry:"", cvv:"", email:"" });
+  const set = (k) => (e) => setForm(p => ({ ...p, [k]: typeof e === "string" ? e : e.target.value }));
+  const formatCard = (v) => v.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim().slice(0, 19);
+  const formatExpiry = (v) => { const d = v.replace(/\D/g, ""); return d.length >= 2 ? d.slice(0, 2) + "/" + d.slice(2, 4) : d; };
+
+  return (
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Montserrat',sans-serif", display: "flex", flexDirection: "column", transition: "background .3s" }}>
+      <MatrixRain opacity={0.07} />
+      <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "14px 18px" : "18px 60px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)", background: isDark ? "rgba(2,12,24,0.88)" : "rgba(240,244,248,0.93)", borderBottom: `1px solid ${C.border}`, transition: "background .3s" }}>
+        <NexaLogo size={isMobile ? 36 : 42} isMobile={isMobile} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <ThemeSwitch />
+          <Btn variant="outline" style={{ padding: isMobile ? "8px 12px" : "10px 20px", fontSize: isMobile ? 11 : 12, border: `1.5px solid ${isDark ? "rgba(255,255,255,.25)" : "rgba(26,74,138,.5)"}`, color: isDark ? C.text : "#0d3060" }} onClick={() => goTo("subscribe")}>← Back</Btn>
+        </div>
+      </nav>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? "28px 16px 60px" : "50px 40px", position: "relative", zIndex: 2 }}>
+        <div style={{ width: "100%", maxWidth: 500 }}>
+          <div style={{ width: "100%", maxWidth: 400, height: isMobile ? 180 : 210, background: `linear-gradient(135deg,${C.navy},${C.navyMid})`, borderRadius: 20, padding: isMobile ? "22px 22px" : "28px 32px", margin: "0 auto 28px", position: "relative", overflow: "hidden", boxShadow: "0 10px 40px rgba(0,43,81,.35)" }}>
+            <div style={{ position: "absolute", right: -30, top: -30, width: 160, height: 160, borderRadius: "50%", background: "rgba(242,147,43,.12)" }} />
+            <div style={{ position: "absolute", right: 20, bottom: -50, width: 120, height: 120, borderRadius: "50%", background: "rgba(146,185,214,.07)" }} />
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,.45)", letterSpacing: 2, textTransform: "uppercase", marginBottom: isMobile ? 18 : 26 }}>NEXA Payment</div>
+            <div style={{ fontSize: isMobile ? 16 : 20, fontWeight: 700, color: "#fff", letterSpacing: 4, marginBottom: isMobile ? 20 : 30, fontFamily: "monospace" }}>{form.card || "•••• •••• •••• ••••"}</div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div><div style={{ fontSize: 9, color: "rgba(255,255,255,.4)", letterSpacing: 2, marginBottom: 3 }}>CARD HOLDER</div><div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>{form.name || "YOUR NAME"}</div></div>
+              <div><div style={{ fontSize: 9, color: "rgba(255,255,255,.4)", letterSpacing: 2, marginBottom: 3 }}>EXPIRES</div><div style={{ fontSize: 12, color: "#fff", fontWeight: 700 }}>{form.expiry || "MM/YY"}</div></div>
+            </div>
+          </div>
+          <div style={{ background: "rgba(242,147,43,.08)", border: "1px solid rgba(242,147,43,.22)", borderRadius: 14, padding: "14px 18px", marginBottom: 24, display: "flex", gap: 12, alignItems: "flex-start" }}>
+            <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>💳</span>
+            <div><div style={{ fontSize: 13, fontWeight: 700, color: C.orangeLight, marginBottom: 4 }}>Paymob Integration Coming Soon</div><div style={{ fontSize: 11, color: C.textMuted, lineHeight: 1.7 }}>Secure card payment is being set up via Paymob. Submit your enrollment request and our team will contact you with payment options.</div></div>
+          </div>
+          <div style={{ background: C.bgCard, borderRadius: 20, border: `1px solid ${C.border}`, padding: isMobile ? "22px 18px" : "32px 30px", boxShadow: "0 4px 32px rgba(0,0,0,.1)" }}>
+            <div style={{ fontSize: 17, fontWeight: 800, color: C.text, marginBottom: 22 }}>Card Details</div>
+            <FInput label="Cardholder Name" placeholder="As printed on card" value={form.name} onChange={set("name")} />
+            <FInput label="Email Address" type="email" placeholder="your@email.com" value={form.email} onChange={set("email")} />
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: C.textMid, marginBottom: 6, letterSpacing: 1.5, textTransform: "uppercase" }}>Card Number</label>
+              <input value={form.card} onChange={e => setForm(p => ({ ...p, card: formatCard(e.target.value) }))} placeholder="0000 0000 0000 0000" maxLength={19} style={{ width: "100%", padding: "12px 14px", border: `1.5px solid ${C.border}`, borderRadius: 8, fontFamily: "monospace", fontSize: 15, color: C.text, background: C.bgSurface, outline: "none", boxSizing: "border-box", letterSpacing: 2 }} />
+            </div>
+            <FormRow>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: C.textMid, marginBottom: 6, letterSpacing: 1.5, textTransform: "uppercase" }}>Expiry Date</label>
+                <input value={form.expiry} onChange={e => setForm(p => ({ ...p, expiry: formatExpiry(e.target.value) }))} placeholder="MM/YY" maxLength={5} style={{ width: "100%", padding: "12px 14px", border: `1.5px solid ${C.border}`, borderRadius: 8, fontFamily: "'Montserrat',sans-serif", fontSize: 14, color: C.text, background: C.bgSurface, outline: "none", boxSizing: "border-box" }} />
+              </div>
+              <FInput label="CVV" type="password" placeholder="•••" value={form.cvv} onChange={set("cvv")} />
+            </FormRow>
+            <Btn variant="primary" block style={{ marginTop: 6, borderRadius: 10, opacity: 0.75 }} onClick={() => toast("Payment gateway coming soon! We'll contact you via your enrollment request 📞")}>
+              💳 Pay Now (Coming Soon)
+            </Btn>
+            <div style={{ textAlign: "center", marginTop: 14, fontSize: 10, color: C.textMuted, letterSpacing: 0.5 }}>🔒 Secure payment powered by Paymob · SSL Encrypted</div>
+          </div>
+          <div style={{ textAlign: "center", marginTop: 18 }}>
+            <span style={{ fontSize: 11, color: C.textMuted, cursor: "pointer" }} onClick={() => goTo("subscribe")}>← Go back to enrollment form</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1177,6 +1511,11 @@ function InstructorDash({ profile, onHome }) {
   const [sForm, setSForm] = useState({ subject: profile.subject || "Robotics", level: "5", cohort: "", room: "", date: "", time: "" });
   const [sSaved, setSSaved] = useState(false);
   const [presenceMap, setPresenceMap] = useState({});
+  const [levelingUp, setLevelingUp] = useState(null);
+  const [notes, setNotes] = useState({});
+  const [noteInput, setNoteInput] = useState({ studentId: "", text: "" });
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [allNotes, setAllNotes] = useState([]);
   usePresence(profile.id);
 
   useEffect(() => {
@@ -1185,9 +1524,51 @@ function InstructorDash({ profile, onHome }) {
     supabase.from("grades").select("*,profiles!grades_student_id_fkey(full_name)").eq("instructor_id", profile.id).order("graded_at", { ascending: false }).limit(20).then(({ data }) => setGrades(data || []));
     supabase.from("profiles").select("id,full_name,avatar_url,role,subject").in("role", ["parent", "student"]).then(({ data }) => setContacts(data || []));
     supabase.from("presence").select("user_id,online,last_seen").then(({ data }) => { const map = {}; (data || []).forEach(p => { map[p.user_id] = p; }); setPresenceMap(map); });
+    loadNotes();
     const ch = supabase.channel("presence-all-inst").on("postgres_changes", { event: "*", schema: "public", table: "presence" }, ({ new: row }) => setPresenceMap(m => ({ ...m, [row.user_id]: row }))).subscribe();
     return () => supabase.removeChannel(ch);
   }, [profile.id]);
+
+  async function loadNotes() {
+    const { data } = await supabase.from("student_notes").select("*,profiles!student_notes_student_id_fkey(full_name)").eq("instructor_id", profile.id).order("created_at", { ascending: false });
+    if (data) {
+      setAllNotes(data);
+      const map = {};
+      data.forEach(n => { if (!map[n.student_id]) map[n.student_id] = []; map[n.student_id].unshift(n); });
+      setNotes(map);
+    }
+  }
+
+  async function saveNote() {
+    if (!noteInput.studentId || !noteInput.text.trim()) return;
+    setNoteSaving(true);
+    const { error } = await supabase.from("student_notes").insert({ instructor_id: profile.id, student_id: noteInput.studentId, note: noteInput.text.trim(), created_at: new Date().toISOString() });
+    if (!error) {
+      setNoteInput(p => ({ ...p, text: "" }));
+      await loadNotes();
+      toast("Note saved!");
+    } else {
+      toast("Could not save note. Please try again or contact support.", "err");
+    }
+    setNoteSaving(false);
+  }
+
+  async function levelUpStudent(studentId) {
+    if (levelingUp) return;
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
+    setLevelingUp(studentId);
+    const newLevel = (student.current_level || 1) + 1;
+    const { error } = await supabase.from("profiles").update({ current_level: newLevel }).eq("id", studentId);
+    if (!error) {
+      setStudents(prev => prev.map(s => s.id === studentId ? { ...s, current_level: newLevel } : s));
+      await supabase.from("notifications").insert({ user_id: studentId, title: "🎉 Level Up!", body: `Congratulations! You've been promoted to Level ${newLevel}! Keep up the great work!`, type: "level" });
+      toast(`🎉 ${student.full_name || "Student"} is now Level ${newLevel}!`);
+    } else {
+      toast("Failed to level up student.", "err");
+    }
+    setLevelingUp(null);
+  }
 
   async function saveGrade() {
     setGErr("");
@@ -1212,8 +1593,8 @@ function InstructorDash({ profile, onHome }) {
 
   const name = profile.full_name || profile.email?.split("@")[0];
   const todaySessions = sessions.filter(s => s.session_date === new Date().toISOString().split("T")[0]);
-  const navItems = [[{ section: "Teaching" }],[{ icon: "🏠", label: "Overview", id: "overview" }],[{ icon: "👥", label: "My Students", id: "students" }],[{ icon: "📅", label: "Sessions", id: "sessions" }],[{ icon: "📊", label: "Grade Entry", id: "grades" }],[{ section: "Communication" }],[{ icon: "💬", label: "Messages", id: "messages" }],[{ icon: "🔔", label: "Notifications", id: "notifications" }]];
-  const titles = { overview: "Instructor Overview", students: "My Students", sessions: "Sessions", grades: "Grade Entry", messages: "Messages", notifications: "Notifications" };
+  const navItems = [[{ section: "Teaching" }],[{ icon: "🏠", label: "Overview", id: "overview" }],[{ icon: "👥", label: "My Students", id: "students" }],[{ icon: "📅", label: "Sessions", id: "sessions" }],[{ icon: "📊", label: "Grade Entry", id: "grades" }],[{ icon: "📝", label: "Student Notes", id: "notes" }],[{ section: "Communication" }],[{ icon: "💬", label: "Messages", id: "messages" }],[{ icon: "🔔", label: "Notifications", id: "notifications" }]];
+  const titles = { overview: "Instructor Overview", students: "My Students", sessions: "Sessions", grades: "Grade Entry", notes: "Student Notes", messages: "Messages", notifications: "Notifications" };
   const flatNav = navItems.filter(n => !n[0]?.section).map(n => ({ ...n[0], active: page === n[0].id, onClick: () => setPage(n[0].id) }));
 
   return (
@@ -1233,7 +1614,22 @@ function InstructorDash({ profile, onHome }) {
       </div>}
       {page === "students" && <div>
         <div style={{ marginBottom: 24 }}><h1 style={{ fontSize: 24, fontWeight: 800, color: C.text }}>My Students</h1><p style={{ fontSize: 13, color: C.textMuted, marginTop: 3 }}>{students.length} enrolled students</p></div>
-        {students.length === 0 ? <div style={{ textAlign: "center", color: C.textMuted, fontSize: 14, padding: "60px 0" }}>No students enrolled yet.</div> : students.map(s => (<div key={s.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: 14, background: C.bgCard, borderRadius: 11, border: `1px solid ${C.border}`, marginBottom: 10 }}><Avatar ini={initials(s.full_name || s.email || "").toUpperCase()} bg={C.navyMid} size={44} radius={11} src={s.avatar_url} /><div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{s.full_name || s.email?.split("@")[0]}</div><div style={{ fontSize: 11, color: C.textMuted }}>{s.age ? `Age ${s.age}` : ""} {s.age ? " · " : ""}Year {s.year || 1} · Level {s.current_level || 1} · {s.total_xp || 0} XP</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 12, color: C.textMuted }}>{s.email}</div></div></div>))}
+        {students.length === 0 ? <div style={{ textAlign: "center", color: C.textMuted, fontSize: 14, padding: "60px 0" }}>No students enrolled yet.</div> : students.map(s => (
+          <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, background: C.bgCard, borderRadius: 13, border: `1px solid ${C.border}`, marginBottom: 10, flexWrap: "wrap" }}>
+            <Avatar ini={initials(s.full_name || s.email || "").toUpperCase()} bg={C.navyMid} size={46} radius={12} src={s.avatar_url} />
+            <div style={{ flex: 1, minWidth: 140 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>{s.full_name || s.email?.split("@")[0]}</div>
+              <div style={{ fontSize: 11, color: C.textMuted, marginTop: 2 }}>{s.age ? `Age ${s.age} · ` : ""}Year {s.year || 1} · <span style={{ color: C.orange, fontWeight: 700 }}>Level {s.current_level || 1}</span> · {s.total_xp || 0} XP</div>
+              <div style={{ fontSize: 10, color: C.textMuted, marginTop: 2 }}>{s.email}</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              <button onClick={() => { setNoteInput({ studentId: s.id, text: "" }); setPage("notes"); }} style={{ padding: "8px 14px", borderRadius: 8, background: C.bgElevated, border: `1px solid ${C.border}`, cursor: "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, color: C.textMid }}>📝 Notes{notes[s.id]?.length ? ` (${notes[s.id].length})` : ""}</button>
+              <button onClick={() => levelUpStudent(s.id)} disabled={levelingUp === s.id} style={{ padding: "8px 16px", borderRadius: 8, background: levelingUp === s.id ? C.bgElevated : `linear-gradient(135deg,${C.orange},#e07b1a)`, border: "none", cursor: levelingUp === s.id ? "wait" : "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, color: levelingUp === s.id ? C.textMuted : "#fff", boxShadow: levelingUp === s.id ? "none" : "0 2px 10px rgba(242,147,43,0.3)", transition: "all .2s" }}>
+                {levelingUp === s.id ? "⏳ Leveling…" : "⬆️ Level Up"}
+              </button>
+            </div>
+          </div>
+        ))}
       </div>}
       {page === "sessions" && <div>
         <div style={{ marginBottom: 24 }}><h1 style={{ fontSize: 24, fontWeight: 800, color: C.text }}>Sessions</h1></div>
@@ -1262,6 +1658,55 @@ function InstructorDash({ profile, onHome }) {
           </CardBody></Card>
           <Card><CardHead title="Recent Grades" /><CardBody style={{ padding: "10px 0", maxHeight: 420, overflowY: "auto" }}>{grades.map(g => (<div key={g.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 18px", borderBottom: `1px solid ${C.border}` }}><div><div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{g.profiles?.full_name || "Student"}</div><div style={{ fontSize: 10, color: C.textMuted }}>{g.assessment_name} · {g.subject}</div></div><div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ fontSize: 15, fontWeight: 800, color: g.score >= 80 ? "#4ade80" : g.score >= 60 ? C.orangeLight : "#f87171" }}>{g.score}%</div><div style={{ fontSize: 10, color: C.textMuted }}>{new Date(g.graded_at).toLocaleDateString()}</div></div></div>))}{grades.length === 0 && <div style={{ textAlign: "center", color: C.textMuted, fontSize: 13, padding: "20px 0" }}>No grades yet.</div>}</CardBody></Card>
         </div>
+      </div>}
+      {page === "notes" && <div>
+        <div style={{ marginBottom: 24 }}><h1 style={{ fontSize: 24, fontWeight: 800, color: C.text }}>Student Notes</h1><p style={{ fontSize: 13, color: C.textMuted, marginTop: 3 }}>Add and view private notes & comments about each student</p></div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 16, marginBottom: 22 }}>
+          <Card><CardHead title="Add Note" /><CardBody>
+            <FSelect label="Student" value={noteInput.studentId} onChange={e => setNoteInput(p => ({ ...p, studentId: e.target.value }))} options={[{ value: "", label: "Select student…" }, ...students.map(s => ({ value: s.id, label: s.full_name || s.email?.split("@")[0] }))]} />
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: C.textMid, marginBottom: 6, letterSpacing: 1.5, textTransform: "uppercase" }}>Note / Comment</label>
+              <textarea placeholder="Write a note about this student's progress, behavior, strengths or areas to improve…" rows={4} value={noteInput.text} onChange={e => setNoteInput(p => ({ ...p, text: e.target.value }))} style={{ width: "100%", padding: "12px 14px", border: `1.5px solid ${C.border}`, borderRadius: 8, fontFamily: "'Montserrat',sans-serif", fontSize: 13, resize: "vertical", background: C.bgSurface, color: C.text, boxSizing: "border-box" }} />
+            </div>
+            <Btn variant="primary" onClick={saveNote} loading={noteSaving} style={{ borderRadius: 9 }}>Save Note</Btn>
+          </CardBody></Card>
+          <Card><CardHead title="Recent Notes" /><CardBody style={{ padding: "10px 14px", maxHeight: 380, overflowY: "auto" }}>
+            {allNotes.length === 0 ? <div style={{ textAlign: "center", color: C.textMuted, fontSize: 13, padding: "30px 0" }}>No notes yet. Add your first note!</div> :
+              allNotes.map(n => (
+                <div key={n.id} style={{ padding: "12px 14px", background: C.bgElevated, borderRadius: 10, marginBottom: 10, border: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.text }}>{n.profiles?.full_name || "Student"}</div>
+                    <div style={{ fontSize: 10, color: C.textMuted }}>{new Date(n.created_at).toLocaleDateString()}</div>
+                  </div>
+                  <div style={{ fontSize: 12, color: C.textMid, lineHeight: 1.6 }}>{n.note}</div>
+                </div>
+              ))
+            }
+          </CardBody></Card>
+        </div>
+        {students.length > 0 && (
+          <Card><CardHead title="Notes by Student" /><CardBody style={{ padding: "10px 14px" }}>
+            {students.map(s => (
+              <div key={s.id} style={{ marginBottom: 14, padding: "14px", background: C.bgElevated, borderRadius: 12, border: `1px solid ${C.border}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: notes[s.id]?.length ? 12 : 0 }}>
+                  <Avatar ini={initials(s.full_name || "").toUpperCase()} bg={C.navyMid} size={32} src={s.avatar_url} radius={8} />
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{s.full_name}</div><div style={{ fontSize: 10, color: C.textMuted }}>Level {s.current_level || 1} · {s.total_xp || 0} XP</div></div>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: notes[s.id]?.length ? "rgba(242,147,43,.15)" : C.bgSurface, color: notes[s.id]?.length ? C.orange : C.textMuted }}>{notes[s.id]?.length || 0} notes</span>
+                    <button onClick={() => setNoteInput({ studentId: s.id, text: "" })} style={{ padding: "5px 10px", borderRadius: 7, background: "transparent", border: `1px solid ${C.border}`, cursor: "pointer", fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, color: C.sky }}>+ Add</button>
+                  </div>
+                </div>
+                {notes[s.id]?.slice(0, 2).map(n => (
+                  <div key={n.id} style={{ padding: "8px 12px", background: C.bgCard, borderRadius: 8, marginBottom: 5, borderLeft: `3px solid ${C.navyMid}` }}>
+                    <div style={{ fontSize: 11, color: C.textMid, lineHeight: 1.6 }}>{n.note}</div>
+                    <div style={{ fontSize: 9, color: C.textMuted, marginTop: 3 }}>{new Date(n.created_at).toLocaleDateString()}</div>
+                  </div>
+                ))}
+                {notes[s.id]?.length > 2 && <div style={{ fontSize: 10, color: C.textMuted, marginTop: 4, paddingLeft: 2 }}>+ {notes[s.id].length - 2} more notes</div>}
+              </div>
+            ))}
+          </CardBody></Card>
+        )}
       </div>}
       {page === "messages" && <div>
         <div style={{ marginBottom: 24 }}><h1 style={{ fontSize: 24, fontWeight: 800, color: C.text }}>Messages</h1></div>
@@ -1358,18 +1803,30 @@ export default function App() {
           @keyframes circuitTrace { 0%{stroke-dashoffset:400} 100%{stroke-dashoffset:0} }
           @keyframes scanLine { 0%{top:-2px;opacity:0} 5%{opacity:1} 95%{opacity:.6} 100%{top:100%;opacity:0} }
           @keyframes slideInLeft { from{transform:translateX(-100%)} to{transform:translateX(0)} }
+          @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+          @keyframes borderGlow { 0%,100%{border-color:rgba(242,147,43,0.5)} 50%{border-color:rgba(146,185,214,0.5)} }
+          @keyframes countUp { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
           .nexa-logo-text { font-family: 'Conthrax','Montserrat',sans-serif !important; }
+          .neon-btn { position:relative; overflow:hidden; }
+          .neon-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent); transform:translateX(-100%); transition:0.6s; }
+          .neon-btn:hover::before { transform:translateX(100%); }
           * { box-sizing: border-box; margin: 0; padding: 0; }
-          ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(146,185,214,.15); border-radius: 10px; }
+          ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(146,185,214,.18); border-radius: 10px; }
           input, select, textarea, button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+          input:focus, select:focus, textarea:focus { outline: none; border-color: rgba(242,147,43,0.55) !important; box-shadow: 0 0 0 3px rgba(242,147,43,0.12) !important; }
           @media (max-width: 767px) { table { font-size: 11px; } table td, table th { padding: 8px 8px !important; } }
           @media (max-width: 480px) { table td:nth-child(4), table th:nth-child(4) { display: none; } }
+          @media (max-width: 600px) { .price-card { min-width: 0 !important; } }
         `}</style>
 
         {screen === "landing" && <Landing goTo={goTo} />}
+        {screen === "about" && <WhatIsNexaPage goTo={goTo} />}
+        {screen === "subscribe" && <SubscriptionPage goTo={goTo} />}
+        {screen === "pay" && <PayWithCardPage goTo={goTo} />}
         {screen === "role-pick" && <RolePicker mode={rolePickMode} onSelect={onRolePicked} />}
         {screen === "login" && <LoginPage role={selectedRole || "parent"} goTo={goTo} onAuthSuccess={onAuthSuccess} />}
         {screen === "signup" && <SignupPage role={selectedRole || "parent"} goTo={goTo} onAuthSuccess={onAuthSuccess} />}
+        {screen === "complete-profile" && <SignupPage role={selectedRole || "student"} goTo={goTo} onAuthSuccess={onAuthSuccess} />}
         {screen === "student-home" && currentProfile && <HomeCard profile={currentProfile} onGoToDash={() => setScreen("student-dash")} onLogout={handleLogout} />}
         {screen === "parent-home" && currentProfile && <HomeCard profile={currentProfile} onGoToDash={() => setScreen("parent-dash")} onLogout={handleLogout} />}
         {screen === "instructor-home" && currentProfile && <HomeCard profile={currentProfile} onGoToDash={() => setScreen("instructor-dash")} onLogout={handleLogout} />}
