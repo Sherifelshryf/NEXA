@@ -442,7 +442,19 @@ function SignupPage({ role, goTo, onAuthSuccess }) {
     });
     if (authErr) { setErr(authErr.message); setLd(false); return; }
 
-    // 2. Build profile payload
+    // 2. Wait for session to be fully active so RLS allows the insert
+    let session = authData.session;
+    if (!session) {
+      // Poll up to 5 seconds for the session to be established
+      for (let i = 0; i < 10; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        const { data: { session: s } } = await supabase.auth.getSession();
+        if (s) { session = s; break; }
+      }
+    }
+    if (!session) { setErr("Session could not be established. Please try logging in."); setLd(false); return; }
+
+    // 3. Build profile payload
     const payload = {
       id: authData.user.id,
       email: f("email"),
@@ -465,11 +477,11 @@ function SignupPage({ role, goTo, onAuthSuccess }) {
       payload.subject = f("subject");
     }
 
-    // 3. Upsert profile
+    // 4. Upsert profile — session is now active so RLS (auth.uid() = id) will pass
     const { error: profErr } = await supabase.from("profiles").upsert(payload);
     if (profErr) { setErr(profErr.message); setLd(false); return; }
 
-    // 4. Link parent → student if email provided
+    // 5. Link parent → student if email provided
     if (role === "parent" && f("student_email")) {
       const { data: students } = await supabase.from("profiles").select("id").eq("email", f("student_email").toLowerCase().trim());
       if (students?.length > 0) {
